@@ -4,13 +4,13 @@ from .models import Post
 
 class BlogList(ListView):
     model = Post
-    template = "home.html"
+    template_name = "home.html"
 
 
 class BlogDetailView(DetailView):
     model = Post
-    template = "post_detail.html"
+    template_name = "post_detail.html"
 
 
 class AboutPageView(TemplateView):
-    template = "post_detail.html"
+    template_name = "post_detail.html"

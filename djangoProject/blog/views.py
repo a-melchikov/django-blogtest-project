@@ -18,15 +18,22 @@ class BlogDetailView(DetailView):
 class AboutPageView(TemplateView):
     template_name = "about.html"
 
+
+class ProfilePageView(TemplateView):
+    template_name = "profile.html"
+
+
 @login_required  # Декоратор, чтобы требовать аутентификацию пользователя
 def create_post(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('home')  # Перенаправляем пользователя на главную страницу после создания поста
+            return redirect(
+                "home"
+            )  # Перенаправляем пользователя на главную страницу после создания поста
     else:
         form = PostForm()
-    return render(request, 'create_post.html', {'form': form})
+    return render(request, "create_post.html", {"form": form})

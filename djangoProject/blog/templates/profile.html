@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Мой профиль
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Ваш профиль</h1>
+        <p>Имя пользователя: {{ user.username }}</p>
+        <p>Дата рождения: {{ user.profile.date_of_birth }}</p>
+        <p>Страна: {{ user.profile.country }}</p>
+        <p>Город: {{ user.profile.city }}</p>
+        <p>Дата регистрации: {{ user.profile.registration_date }}</p>
+        <p>О себе: {{ user.profile.bio }}</p>
+    </div>
+{% endblock %}

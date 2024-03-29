@@ -1,8 +1,9 @@
+from django.contrib import messages
 from django.views.generic import ListView, DetailView, TemplateView
-from .models import Post
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from blog.forms import PostForm
+from django.shortcuts import render, redirect
+from .models import Post
+from .forms import PostForm, ProfileForm
 
 
 class BlogList(ListView):
@@ -37,3 +38,14 @@ def create_post(request):
     else:
         form = PostForm()
     return render(request, "create_post.html", {"form": form})
+
+
+def edit_profile(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect("profile")
+    else:
+        form = ProfileForm(instance=request.user.profile)
+    return render(request, "edit_profile.html", {"form": form})

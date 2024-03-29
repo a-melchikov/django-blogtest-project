@@ -14,5 +14,7 @@
         <p>Город: {{ user.profile.city }}</p>
         <p>Дата регистрации: {{ user.profile.registration_date }}</p>
         <p>О себе: {{ user.profile.bio }}</p>
+        
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
     </div>
 {% endblock %}

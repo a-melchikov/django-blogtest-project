@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Редактировать профиль
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Редактировать профиль</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
+    </div>
+{% endblock %}

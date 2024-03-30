@@ -15,6 +15,9 @@
                         <a href="{% url 'post_detail' post.pk %}">
                             <button type="button" class="btn btn-primary">Подробнее</button>
                         </a>
+                        <a href="{% url 'edit_post' post.pk %}">
+                            <button type="button" class="btn btn-secondary">Редактировать</button>
+                        </a>
                     </div>
                 </div>
             {% empty %}

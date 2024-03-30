@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, TemplateView
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Post
 from .forms import PostForm, ProfileForm
 
@@ -56,3 +56,15 @@ def edit_profile(request):
     else:
         form = ProfileForm(instance=request.user.profile)
     return render(request, "edit_profile.html", {"form": form})
+
+@login_required  
+def edit_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect("my_posts")
+    else:
+        form = PostForm(instance=post)
+    return render(request, "edit_post.html", {"form": form})

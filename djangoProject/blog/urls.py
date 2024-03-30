@@ -3,6 +3,7 @@ from .views import (
     AboutPageView,
     BlogDetailView,
     BlogList,
+    PostDeleteView,
     ProfilePageView,
     create_post,
     edit_post,
@@ -12,6 +13,7 @@ from .views import (
 
 urlpatterns = [
     path("post/<int:pk>/", BlogDetailView.as_view(), name="post_detail"),
+    path("post/delete/<int:pk>/", PostDeleteView.as_view(), name="delete_post"),
     path('post/edit/<int:pk>/', edit_post, name='edit_post'),
     path("about/", AboutPageView.as_view(), name="about"),
     path("create_post/", create_post, name="create_post"),

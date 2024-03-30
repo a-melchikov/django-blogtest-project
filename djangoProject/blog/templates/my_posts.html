@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block title %}Мой блог | Мои посты{% endblock %}
 
 {% block content %}
@@ -12,12 +11,10 @@
                         <h2 class="card-title">{{ post.title }}</h2>
                         <p class="card-text">{{ post.body }}</p>
                         <p class="card-text">Автор поста: <b>{{ post.author }}</b></p>
-                        <a href="{% url 'post_detail' post.pk %}">
-                            <button type="button" class="btn btn-primary">Подробнее</button>
-                        </a>
-                        <a href="{% url 'edit_post' post.pk %}">
-                            <button type="button" class="btn btn-secondary">Редактировать</button>
-                        </a>
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
+                        <a href="{% url 'edit_post' post.pk %}" class="btn btn-secondary">Редактировать</a>
+                        <!-- Кнопка "Удалить" для вызова модального окна -->
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal" data-postid="{{ post.pk }}">Удалить</button>
                     </div>
                 </div>
             {% empty %}
@@ -25,4 +22,40 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Модальное окно для подтверждения удаления поста -->
+    <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePostModalLabel">Удаление поста</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите удалить этот пост?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <!-- Кнопка для подтверждения удаления поста -->
+                    <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Удалить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for passing the post ID and deleting the post -->
+    <script>
+        // Обработчик события щелчка по кнопке "Удалить"
+        document.querySelectorAll('.btn-danger').forEach(button => {
+            button.addEventListener('click', function() {
+                const postId = this.getAttribute('data-postid');
+                if (postId) { // Проверяем, что postId не равен null или undefined
+                    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                    // Установить атрибут href для кнопки подтверждения удаления
+                    confirmDeleteBtn.setAttribute('href', `/post/delete/${postId}/`);
+                }
+            });
+        });
+    </script>
+      
 {% endblock %}

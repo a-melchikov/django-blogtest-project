@@ -1,5 +1,6 @@
-from django.contrib import messages
-from django.views.generic import ListView, DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, TemplateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Post
@@ -27,7 +28,7 @@ class ProfilePageView(TemplateView):
     template_name = "profile.html"
 
 
-@login_required  
+@login_required
 def create_post(request):
     if request.method == "POST":
         form = PostForm(request.POST)
@@ -40,11 +41,12 @@ def create_post(request):
         form = PostForm()
     return render(request, "create_post.html", {"form": form})
 
+
 def my_posts(request):
     # Получаем все посты текущего пользователя
     user = request.user
     user_posts = Post.objects.filter(author=user)
-    return render(request, 'my_posts.html', {'user_posts': user_posts})
+    return render(request, "my_posts.html", {"user_posts": user_posts})
 
 
 def edit_profile(request):
@@ -57,7 +59,8 @@ def edit_profile(request):
         form = ProfileForm(instance=request.user.profile)
     return render(request, "edit_profile.html", {"form": form})
 
-@login_required  
+
+@login_required
 def edit_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.method == "POST":
@@ -68,3 +71,13 @@ def edit_post(request, pk):
     else:
         form = PostForm(instance=post)
     return render(request, "edit_post.html", {"form": form})
+
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    success_url = reverse_lazy(
+        "my_posts"
+    )  # После успешного удаления перенаправить на страницу с моими постами
+    template_name = (
+        "post_confirm_delete.html"  # Создайте шаблон подтверждения удаления поста
+    )

@@ -10,6 +10,9 @@ class BlogList(ListView):
     model = Post
     template_name = "home.html"
 
+    def get_queryset(self):
+        return Post.objects.all()
+
 
 class BlogDetailView(DetailView):
     model = Post
@@ -24,7 +27,7 @@ class ProfilePageView(TemplateView):
     template_name = "profile.html"
 
 
-@login_required  # Декоратор, чтобы требовать аутентификацию пользователя
+@login_required  
 def create_post(request):
     if request.method == "POST":
         form = PostForm(request.POST)
@@ -32,12 +35,16 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect(
-                "home"
-            )  # Перенаправляем пользователя на главную страницу после создания поста
+            return redirect("home")
     else:
         form = PostForm()
     return render(request, "create_post.html", {"form": form})
+
+def my_posts(request):
+    # Получаем все посты текущего пользователя
+    user = request.user
+    user_posts = Post.objects.filter(author=user)
+    return render(request, 'my_posts.html', {'user_posts': user_posts})
 
 
 def edit_profile(request):

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Мой блог | Мои посты{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Мои посты</h1>
+        <div class="col-md-12">
+            {% for post in user_posts %}
+                <div class="bg-image card mb-4 shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
+                    <div class="card-body text-white">
+                        <h2 class="card-title">{{ post.title }}</h2>
+                        <p class="card-text">{{ post.body }}</p>
+                        <p class="card-text">Автор поста: <b>{{ post.author }}</b></p>
+                        <a href="{% url 'post_detail' post.pk %}">
+                            <button type="button" class="btn btn-primary">Подробнее</button>
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <p>У вас пока нет постов.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

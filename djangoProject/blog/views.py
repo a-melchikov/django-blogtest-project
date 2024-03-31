@@ -3,7 +3,9 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, TemplateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Post
+
+from authentication.models import CustomUser
+from .models import Message, Post
 from .forms import PostForm, ProfileForm
 
 
@@ -81,3 +83,27 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
     template_name = (
         "post_confirm_delete.html"  # Создайте шаблон подтверждения удаления поста
     )
+
+
+@login_required
+def inbox(request):
+    messages = Message.objects.filter(recipient=request.user).order_by("-timestamp")
+    return render(request, "inbox.html", {"messages": messages})
+
+
+@login_required
+def send_message(request):
+    if request.method == "POST":
+        recipient = request.POST["recipient"]
+        subject = request.POST["subject"]
+        body = request.POST["body"]
+        message = Message(
+            sender=request.user,
+            recipient=CustomUser.objects.get(username=recipient),
+            subject=subject,
+            body=body,
+        )
+        message.save()
+        return redirect("inbox")
+    else:
+        return render(request, "send_message.html")

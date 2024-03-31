@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Мой блог | Входящие сообщения{% endblock %}
+
+{% block content %}
+    <div style="margin-top: 1%">
+        <div class="container-fluid">
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="card shadow-1-strong">
+                        <div class="card-body">
+                            <h2>Входящие сообщения</h2>
+                            <ul class="list-group">
+                                {% for message in messages %}
+                                    <li class="list-group-item">
+                                        <strong>От:</strong> {{ message.sender.username }}<br>
+                                        <strong>Тема:</strong> {{ message.subject }}<br>
+                                        <strong>Дата:</strong> {{ message.timestamp }}<br>
+                                        <p>{{ message.body }}</p>
+                                    </li>
+                                {% empty %}
+                                    <li class="list-group-item">Нет входящих сообщений.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

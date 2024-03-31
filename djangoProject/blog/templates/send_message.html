@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Мой блог | Отправить сообщение{% endblock %}
+
+{% block content %}
+    <div style="margin-top: 1%">
+        <div class="container-fluid">
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="card shadow-1-strong">
+                        <div class="card-body">
+                            <h2>Отправить сообщение</h2>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="recipient">Получатель:</label>
+                                    <input type="text" name="recipient" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">Тема:</label>
+                                    <input type="text" name="subject" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="body">Сообщение:</label>
+                                    <textarea name="body" class="form-control"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Отправить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

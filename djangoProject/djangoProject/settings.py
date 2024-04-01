@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "channels",
     "authentication.apps.AuthenticationConfig",
     "blog.apps.BlogConfig",
     "django.contrib.admin",
@@ -133,3 +134,5 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "authentication.CustomUser"
+
+ASGI_APPLICATION = "myproject.asgi.application"

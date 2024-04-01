@@ -1,0 +1,43 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Чат{% endblock %}
+
+{% block content %}
+<div id="chat-room">
+    <ul id="messages"></ul>
+    <input type="text" id="message-input">
+    <button onclick="sendMessage()">Отправить</button>
+</div>
+
+<script>
+    const roomName = '{{ room_name }}';
+    const username = '{{ user.username }}';
+
+    var wsStart = 'ws://';
+    if (window.location.protocol == 'https:') {
+        wsStart = 'wss://';
+    }
+    var chatSocket = new WebSocket(
+        wsStart + window.location.host +
+        '/ws/chat/' + roomName + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        $('#messages').append(
+            '<li><strong>' + data.username + '</strong>: ' + data.message + '</li>'
+        );
+    };
+
+    function sendMessage() {
+        const messageInputDom = document.getElementById('message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'username': username,
+            'room_name': roomName
+        }));
+        messageInputDom.value = '';
+    }
+</script>
+{% endblock %}

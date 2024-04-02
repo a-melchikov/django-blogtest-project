@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic.base import RedirectView
 from .views import (
     AboutPageView,
     BlogDetailView,
@@ -23,6 +24,7 @@ urlpatterns = [
     path("profile/edit/", edit_profile, name="edit_profile"),
     path("my_posts/", my_posts, name="my_posts"),
     path("catalog/", BlogList.as_view(), name="home"),
+    path("", RedirectView.as_view(pattern_name='home', permanent=False)),
     path("send_message/", send_message, name="send_message"),
     path("inbox/", inbox, name="inbox"),
 ]

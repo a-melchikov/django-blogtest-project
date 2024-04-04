@@ -35,9 +35,9 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Создаем профиль пользователя
-            Profile.objects.create(user=user)
+            profile = Profile.objects.create(user=user)
             return redirect('login')  
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
+

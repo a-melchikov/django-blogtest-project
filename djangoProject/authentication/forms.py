@@ -1,12 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Profile
-
+from django.contrib.auth.models import User
+from .models import Profile
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
-        model = CustomUser
-        fields = ["username", "email", "age"]
+        model = User
+        fields = ["username", "email"]
 
     def save(self, commit=True):
         user = super().save(commit=False)

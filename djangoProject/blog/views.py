@@ -3,8 +3,8 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, TemplateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.models import User
 
-from authentication.models import CustomUser
 from .models import Message, Post
 from .forms import PostForm, ProfileForm
 
@@ -99,7 +99,7 @@ def send_message(request):
         body = request.POST["body"]
         message = Message(
             sender=request.user,
-            recipient=CustomUser.objects.get(username=recipient),
+            recipient=User.objects.get(username=recipient),
             subject=subject,
             body=body,
         )

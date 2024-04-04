@@ -1,13 +1,12 @@
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from authentication.models import CustomUser
+from django.contrib.auth.models import User
 
 
 class Post(models.Model):
     title = models.CharField(max_length=450)
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
     )
     body = models.TextField()
@@ -19,10 +18,10 @@ class Post(models.Model):
 
 class Message(models.Model):
     sender = models.ForeignKey(
-        CustomUser, related_name="sent_messages", on_delete=models.CASCADE
+        User, related_name="sent_messages", on_delete=models.CASCADE
     )
     recipient = models.ForeignKey(
-        CustomUser, related_name="received_messages", on_delete=models.CASCADE
+        User, related_name="received_messages", on_delete=models.CASCADE
     )
     subject = models.CharField(max_length=200)
     body = models.TextField()

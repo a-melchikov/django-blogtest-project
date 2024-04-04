@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 
+from .models import Profile
+
 from .forms import CustomUserCreationForm
 
 
@@ -19,7 +21,7 @@ def login_view(request):
             return redirect(
                 "login"
             )  # Перенаправляем обратно на страницу входа с сообщением об ошибке
-    return render(request, "authentication/login.html")
+    return render(request, "registration/login.html")
 
 
 def logout_view(request):
@@ -29,13 +31,13 @@ def logout_view(request):
 
 
 def register(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect(
-                "login"
-            )  # Перенаправление на страницу входа после успешной регистрации
+            user = form.save()
+            # Создаем профиль пользователя
+            Profile.objects.create(user=user)
+            return redirect('login')  
     else:
         form = CustomUserCreationForm()
-    return render(request, "registration/register.html", {"form": form})
+    return render(request, 'registration/register.html', {'form': form})

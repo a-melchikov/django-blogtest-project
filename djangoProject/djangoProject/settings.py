@@ -133,8 +133,6 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "authentication.CustomUser"
-
 ASGI_APPLICATION = "myproject.asgi.application"
 
 # Укажите путь к вашей директории для статических файлов

@@ -7,13 +7,13 @@ from .views import (
     BlogDetailView,
     BlogList,
     PostDeleteView,
-    ProfilePageView,
     create_post,
     edit_post,
     edit_profile,
     my_posts,
     send_message,
     inbox,
+    user_profile_view,
 )
 
 urlpatterns = [
@@ -22,7 +22,7 @@ urlpatterns = [
     path("post/edit/<int:pk>/", edit_post, name="edit_post"),
     path("about/", AboutPageView.as_view(), name="about"),
     path("create_post/", create_post, name="create_post"),
-    path("profile/", ProfilePageView.as_view(), name="profile"),
+    path("profile/<str:user_name>/", user_profile_view, name="user_profile"),
     path("profile/edit/", edit_profile, name="edit_profile"),
     path("my_posts/", my_posts, name="my_posts"),
     path("catalog/", BlogList.as_view(), name="home"),

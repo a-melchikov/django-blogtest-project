@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    Мой профиль
+    Профиль
 {% endblock %}
 
 {% block content %}
@@ -35,7 +35,7 @@
             {% endif %}
         </div>
         <div class="profile-info">
-            <h1>Ваш профиль</h1>
+            <h1>Профиль</h1>
             <p>Имя пользователя: {{ user.username }}</p>
             <p>Дата рождения: {{ user.profile.date_of_birth }}</p>
             <p>Страна: {{ user.profile.country }}</p>

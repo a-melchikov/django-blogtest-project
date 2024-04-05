@@ -49,7 +49,7 @@
                                 <a href="{% url 'create_post' %}" class="nav-link">Создать пост</a>
                             </li>
                             <li class="nav-item {% if request.path == '/profile/' %}active{% endif %}">
-                                <a href="{% url 'profile' %}" class="nav-link">Мой профиль</a>
+                                <a href="{% url 'user_profile' user.username %}" class="nav-link">Мой профиль</a>
                             </li>
                             <li class="nav-item {% if request.path == '/my_posts/' %}active{% endif %}">
                                 <a href="{% url 'my_posts' %}" class="nav-link">Мои посты</a>

@@ -26,10 +26,6 @@ class AboutPageView(TemplateView):
     template_name = "about.html"
 
 
-class ProfilePageView(TemplateView):
-    template_name = "profile.html"
-
-
 @login_required
 def create_post(request):
     if request.method == "POST":
@@ -107,3 +103,10 @@ def send_message(request):
         return redirect("inbox")
     else:
         return render(request, "send_message.html")
+
+
+def user_profile_view(request, user_name):
+    # Получаем пользователя по его имени или возвращаем 404 ошибку, если пользователь не найден
+    user = get_object_or_404(User, username=user_name)
+    # Здесь можно передать данные о пользователе в шаблон для отображения
+    return render(request, "profile.html", {"user": user})

@@ -13,16 +13,16 @@
                 <form method="post">
                     {% csrf_token %}
                     <!-- Поле для отображения ошибок формы -->
-                    {% if form.non_field_errors %}
+                    {% if user_form.errors %}
                         <div class="alert alert-danger" role="alert">
-                            {{ form.non_field_errors }}
+                            {{ user_form.non_field_errors }}
                         </div>
                     {% endif %}
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Имя пользователя:</label>
-                        {{ form.username }}
+                        {{ user_form.username }}
                         <!-- Отображение ошибок для поля username -->
-                        {% for error in form.username.errors %}
+                        {% for error in user_form.username.errors %}
                             <div class="alert alert-danger" role="alert">
                                 {{ error }}
                             </div>
@@ -30,9 +30,9 @@
                     </div>
                     <div class="mb-3">
                         <label for="id_email" class="form-label">Email:</label>
-                        {{ form.email }}
+                        {{ user_form.email }}
                         <!-- Отображение ошибок для поля email -->
-                        {% for error in form.email.errors %}
+                        {% for error in user_form.email.errors %}
                             <div class="alert alert-danger" role="alert">
                                 {{ error }}
                             </div>
@@ -40,9 +40,9 @@
                     </div>
                     <div class="mb-3">
                         <label for="id_password1" class="form-label">Пароль:</label>
-                        {{ form.password1 }}
+                        {{ user_form.password1 }}
                         <!-- Отображение ошибок для поля password1 -->
-                        {% for error in form.password1.errors %}
+                        {% for error in user_form.password1.errors %}
                             <div class="alert alert-danger" role="alert">
                                 {{ error }}
                             </div>
@@ -50,9 +50,9 @@
                     </div>
                     <div class="mb-3">
                         <label for="id_password2" class="form-label">Повторите пароль:</label>
-                        {{ form.password2 }}
+                        {{ user_form.password2 }}
                         <!-- Отображение ошибок для поля password2 -->
-                        {% for error in form.password2.errors %}
+                        {% for error in user_form.password2.errors %}
                             <div class="alert alert-danger" role="alert">
                                 {{ error }}
                             </div>

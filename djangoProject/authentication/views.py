@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.urls import reverse
 
 from .models import Profile
-
-from .forms import CustomUserCreationForm
+from .forms import ProfileForm, UserForm
 
 
 def login_view(request):
@@ -31,13 +31,23 @@ def logout_view(request):
 
 
 def register(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            profile = Profile.objects.create(user=user)
-            return redirect('login')  
+    if request.method == "POST":
+        user_form = UserForm(request.POST)
+        profile_form = ProfileForm(request.POST)
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            profile_exists = Profile.objects.filter(user=user).exists()
+            if not profile_exists:
+                profile = profile_form.save(commit=False)
+                profile.user = user
+                profile.save()
+            login(request, user)
+            return redirect(reverse("home"))
     else:
-        form = CustomUserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
-
+        user_form = UserForm()
+        profile_form = ProfileForm()
+    return render(
+        request,
+        "registration/register.html",
+        {"user_form": user_form, "profile_form": profile_form},
+    )

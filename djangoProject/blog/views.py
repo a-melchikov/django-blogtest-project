@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 
+from authentication.models import Profile
+
 from .models import Message, Post
 from .forms import PostForm, ProfileForm
 
@@ -110,3 +112,11 @@ def user_profile_view(request, user_name):
     user = get_object_or_404(User, username=user_name)
     # Здесь можно передать данные о пользователе в шаблон для отображения
     return render(request, "profile.html", {"user": user})
+
+class AllProfilesView(ListView):
+    model = Profile
+    template_name = "all_profiles.html"
+    context_object_name = "profile_list"
+
+    def get_queryset(self):
+        return Profile.objects.all()

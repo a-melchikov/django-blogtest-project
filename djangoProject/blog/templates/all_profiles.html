@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Все пользователи
+{% endblock %}
+
+{% block content %}
+    <style>
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .user-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .user-info h2 {
+            margin-top: 0;
+        }
+    </style>
+    <div class="container">
+        <h1>Список пользователей</h1>
+        {% for profile in profile_list %}
+            <div class="user-info">
+                <h2>{{ profile.user.username }}</h2>
+                <p>Дата рождения: {{ profile.date_of_birth }}</p>
+                <p>Страна: {{ profile.country }}</p>
+                <p>Город: {{ profile.city }}</p>
+                <p>Дата регистрации: {{ profile.registration_date }}</p>
+                <p>О себе: {{ profile.bio }}</p>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

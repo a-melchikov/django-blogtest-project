@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import (
     AboutPageView,
+    AllProfilesView,
     BlogDetailView,
     BlogList,
     PostDeleteView,
@@ -22,6 +23,7 @@ urlpatterns = [
     path("post/edit/<int:pk>/", edit_post, name="edit_post"),
     path("about/", AboutPageView.as_view(), name="about"),
     path("create_post/", create_post, name="create_post"),
+    path("profiles/", AllProfilesView.as_view(), name="all_profiles"),
     path("profile/<str:user_name>/", user_profile_view, name="user_profile"),
     path("profile/edit/", edit_profile, name="edit_profile"),
     path("my_posts/", my_posts, name="my_posts"),

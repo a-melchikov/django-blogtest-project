@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, TemplateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
@@ -49,15 +49,19 @@ def my_posts(request):
     return render(request, "my_posts.html", {"user_posts": user_posts})
 
 
-def edit_profile(request):
+@login_required
+def edit_profile(request, user_name):
+    user = get_object_or_404(User, username=user_name)
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        form = ProfileForm(request.POST, request.FILES, instance=user.profile)
         if form.is_valid():
             form.save()
-            return redirect("profile")
+            return redirect("user_profile", user_name=request.user.username)
     else:
-        form = ProfileForm(instance=request.user.profile)
+        form = ProfileForm(instance=user.profile)
     return render(request, "edit_profile.html", {"form": form})
+
+
 
 
 @login_required

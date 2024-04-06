@@ -37,11 +37,11 @@
         <div class="profile-info">
             <h1>Профиль</h1>
             <p>Имя пользователя: {{ user.username }}</p>
-            <p>Дата рождения: {{ user.profile.date_of_birth }}</p>
-            <p>Страна: {{ user.profile.country }}</p>
-            <p>Город: {{ user.profile.city }}</p>
+            <p>Дата рождения: {% if user.profile.date_of_birth %}{{ user.profile.date_of_birth }}{% else %}Не указана{% endif %}</p>
+            <p>Страна: {% if user.profile.country %}{{ user.profile.country }}{% else %}Не указана{% endif %}</p>
+            <p>Город: {% if user.profile.city %}{{ user.profile.city }}{% else %}Не указан{% endif %}</p>
             <p>Дата регистрации: {{ user.profile.registration_date }}</p>
-            <p>О себе: {{ user.profile.bio }}</p>
+            <p>О себе: {% if user.profile.bio %}{{ user.profile.bio }}{% else %}Информация не заполнена{% endif %}</p>
             <a href="{% url 'edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
         </div>
     </div>

@@ -11,6 +11,14 @@
             background: linear-gradient(90deg, rgba(68,68,82,1) 0%, rgba(215,215,228,1) 64%, rgba(77,95,98,1) 100%);
             padding: 40px;
         }
+        .username {
+            color: #ffcc00;
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
     </style>
 </head>
 <body>
@@ -69,6 +77,9 @@
                     </ul>
                     
                     {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="navbar-text text-light me-3 username">{{ user.username }}</span>
+                        </li>
                         <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-outline-light">Выйти</button>

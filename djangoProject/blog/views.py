@@ -42,6 +42,7 @@ def create_post(request):
     return render(request, "create_post.html", {"form": form})
 
 
+@login_required
 def my_posts(request):
     # Получаем все посты текущего пользователя
     user = request.user
@@ -60,8 +61,6 @@ def edit_profile(request, user_name):
     else:
         form = ProfileForm(instance=user.profile)
     return render(request, "edit_profile.html", {"form": form})
-
-
 
 
 @login_required
@@ -109,7 +108,7 @@ def send_message(request):
         return redirect("inbox")
     else:
         profiles = Profile.objects.all()
-        return render(request, "send_message.html", {'profiles': profiles})
+        return render(request, "send_message.html", {"profiles": profiles})
 
 
 def user_profile_view(request, user_name):
@@ -117,6 +116,7 @@ def user_profile_view(request, user_name):
     user = get_object_or_404(User, username=user_name)
     # Здесь можно передать данные о пользователе в шаблон для отображения
     return render(request, "profile.html", {"user": user})
+
 
 class AllProfilesView(ListView):
     model = Profile

@@ -101,14 +101,15 @@ def send_message(request):
         body = request.POST["body"]
         message = Message(
             sender=request.user,
-            recipient=User.objects.get(username=recipient),
+            recipient=Profile.objects.get(user__username=recipient).user,
             subject=subject,
             body=body,
         )
         message.save()
         return redirect("inbox")
     else:
-        return render(request, "send_message.html")
+        profiles = Profile.objects.all()
+        return render(request, "send_message.html", {'profiles': profiles})
 
 
 def user_profile_view(request, user_name):

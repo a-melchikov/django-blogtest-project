@@ -76,9 +76,9 @@
                         {% endif %}
                     </ul>
                     
-                    {% if user.is_authenticated %}
+                    {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <span class="navbar-text text-light me-3 username">{{ user.username }}</span>
+                            <span class="navbar-text text-light me-3 username">{{ request.user.username }}</span>
                         </li>
                         <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}
@@ -87,6 +87,7 @@
                     {% else %}
                         <a href="{% url 'login' %}" class="btn btn-outline-light">Войти</a>
                     {% endif %}
+
                 </div>
             </div>
         </nav>

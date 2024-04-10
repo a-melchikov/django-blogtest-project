@@ -1,14 +1,20 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, DetailView, TemplateView, DeleteView
+from django.views.generic import (
+    CreateView,
+    ListView,
+    DetailView,
+    TemplateView,
+    DeleteView,
+)
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Message, Post
-from .forms import PostForm, ProfileForm
+from .models import Message, Post, Comment
+from .forms import PostForm, ProfileForm, CommentForm
 
 
 class BlogList(ListView):
@@ -22,6 +28,28 @@ class BlogList(ListView):
 class BlogDetailView(DetailView):
     model = Post
     template_name = "post_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(BlogDetailView, self).get_context_data(**kwargs)
+        post = self.get_object()
+        context["comments"] = post.comments.filter(approved_comment=True).order_by(
+            "-created_date"
+        )
+        context["comment_form"] = CommentForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        post = self.get_object()
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            form.instance.author = request.user
+            form.instance.post = post
+            form.save()
+            return redirect("post_detail", pk=post.pk)
+        else:
+            context = self.get_context_data(object=post)
+            context["form"] = form
+            return render(request, self.template_name, context)
 
 
 class AboutPageView(TemplateView):

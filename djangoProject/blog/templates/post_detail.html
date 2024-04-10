@@ -12,6 +12,31 @@
                             <h2>{{ post.title }}</h2>
                             <p>Автор поста: <b>{{ post.author }}</b></p>
                             <p>{{ post.body }}</p>
+                            <h2>Комментарии:</h2>
+                            <ul>
+                            {% for comment in comments %}
+                                <li>
+                                {{ comment.author }} - {{ comment.created_date }}<br>
+                                {{ comment.text }}
+                                </li>
+                            {% endfor %}
+                            </ul>
+
+                            <h2>Оставить комментарий</h2>
+                            <form method="POST">
+                            {% csrf_token %}
+                            {{ comment_form.as_p }}
+
+                            {% if form.errors %}
+                                <ul class="errorlist">
+                                  {% for error in form.errors %}
+                                    <li>{{ error }}</li>
+                                  {% endfor %}
+                                </ul>
+                            {% endif %}
+
+                            <button type="submit">Отправить комментарий</button>
+                            </form>
                         </div>
                     </div>
                 </div>

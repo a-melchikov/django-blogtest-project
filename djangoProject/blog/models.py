@@ -30,3 +30,26 @@ class Message(models.Model):
 
     def __str__(self):
         return self.subject
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='comments'  # Это позволит получить доступ ко всем комментариям определенного поста
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField()
+    created_date = models.DateTimeField(default=timezone.now)
+    approved_comment = models.BooleanField(default=False)
+
+    # Логика для обработки комментариев (то есть обрабатывать комментарии)
+    def approve(self):
+        self.approved_comment = True
+        self.save()
+
+    def __str__(self):
+        return self.text

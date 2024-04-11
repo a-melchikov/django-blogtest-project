@@ -44,7 +44,7 @@ class Comment(models.Model):
     )
     text = models.TextField()
     created_date = models.DateTimeField(default=timezone.now)
-    approved_comment = models.BooleanField(default=False)
+    approved_comment = models.BooleanField(default=True)
 
     # Логика для обработки комментариев (то есть обрабатывать комментарии)
     def approve(self):

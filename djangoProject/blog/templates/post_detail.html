@@ -11,36 +11,32 @@
                         <div class="card-body text-white">
                             <h2>{{ post.title }}</h2>
                             <p>Автор поста: <b>{{ post.author }}</b></p>
-                            <p>{{ post.body }}</p>
-                            <h2>Комментарии:</h2>
-                            <ul>
-                            {% for comment in comments %}
-                                <li>
-                                {{ comment.author }} - {{ comment.created_date }}<br>
-                                {{ comment.text }}
-                                </li>
-                            {% endfor %}
-                            </ul>
-
-                            <h2>Оставить комментарий</h2>
-                            <form method="POST">
-                            {% csrf_token %}
-                            {{ comment_form.as_p }}
-
-                            {% if form.errors %}
-                                <ul class="errorlist">
-                                  {% for error in form.errors %}
-                                    <li>{{ error }}</li>
-                                  {% endfor %}
-                                </ul>
-                            {% endif %}
-
-                            <button type="submit">Отправить комментарий</button>
-                            </form>
+                            <p>{{ post.body }}</p>                     
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <h2>Комментарии</h2>
+        {% for comment in comments %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ comment.author.username }}</h5>
+                    <p class="card-text">{{ comment.text }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p>Пока нет комментариев.</p>
+        {% endfor %}
+
+        <h2>Добавить комментарий</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
     </div>
 {% endblock %}

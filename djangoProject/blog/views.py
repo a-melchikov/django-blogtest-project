@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -30,11 +31,9 @@ class BlogDetailView(DetailView):
     template_name = "post_detail.html"
 
     def get_context_data(self, **kwargs):
-        context = super(BlogDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         post = self.get_object()
-        context["comments"] = post.comments.filter(approved_comment=True).order_by(
-            "-created_date"
-        )
+        context["comments"] = post.comments.filter(approved_comment=True)
         context["comment_form"] = CommentForm()
         return context
 
@@ -42,14 +41,13 @@ class BlogDetailView(DetailView):
         post = self.get_object()
         form = CommentForm(request.POST)
         if form.is_valid():
-            form.instance.author = request.user
-            form.instance.post = post
-            form.save()
-            return redirect("post_detail", pk=post.pk)
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))
         else:
-            context = self.get_context_data(object=post)
-            context["form"] = form
-            return render(request, self.template_name, context)
+            return self.render_to_response(self.get_context_data(form=form))
 
 
 class AboutPageView(TemplateView):

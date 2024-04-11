@@ -1,7 +1,31 @@
 from django.contrib import admin
-from .models import Post, Comment, Message
+from .models import Post, Message, Comment
 
-# Register your models here.
-admin.site.register(Post)
-admin.site.register(Comment)
-admin.site.register(Message)
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ("title", "author", "publish_date")
+    list_filter = ("author", "publish_date")
+    search_fields = ("title", "body")
+    ordering = ("-publish_date",)
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ("subject", "sender", "recipient", "timestamp", "read")
+    list_filter = ("sender", "recipient", "timestamp", "read")
+    search_fields = ("subject", "body")
+    ordering = ("-timestamp",)
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("post", "author", "text", "created_date", "approved_comment")
+    list_filter = ("post", "author", "created_date", "approved_comment")
+    search_fields = ("text",)
+    ordering = ("-created_date",)
+
+
+admin.site.site_header = "Управление блогом"
+admin.site.site_title = "Администрирование"
+admin.site.index_title = "Главная страница административной панели"

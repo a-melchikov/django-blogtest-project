@@ -24,7 +24,8 @@
         {% for comment in comments %}
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ comment.author.username }}</h5>
+                    <h5 class="card-title"><a href="{% url 'user_profile' comment.author.username %}">{{ comment.author.username }}</a></h5>
+                    <h6 class="card-title">{{ comment.created_date }}</h6>
                     <p class="card-text">{{ comment.text }}</p>
                 </div>
             </div>

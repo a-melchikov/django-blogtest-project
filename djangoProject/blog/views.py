@@ -2,7 +2,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
-    CreateView,
     ListView,
     DetailView,
     TemplateView,
@@ -14,7 +13,7 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Message, Post, Comment
+from .models import Message, Post
 from .forms import PostForm, ProfileForm, CommentForm
 
 
@@ -33,7 +32,9 @@ class BlogDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         post = self.get_object()
-        context["comments"] = post.comments.filter(approved_comment=True)
+        context["comments"] = post.comments.filter(approved_comment=True).order_by(
+            "-created_date"
+        )
         context["comment_form"] = CommentForm()
         return context
 

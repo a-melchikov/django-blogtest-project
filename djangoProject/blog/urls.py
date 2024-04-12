@@ -15,6 +15,7 @@ from .views import (
     send_message,
     inbox,
     user_profile_view,
+    notifications,
 )
 
 urlpatterns = [
@@ -31,6 +32,7 @@ urlpatterns = [
     path("", RedirectView.as_view(pattern_name="home", permanent=False)),
     path("send_message/", send_message, name="send_message"),
     path("inbox/", inbox, name="inbox"),
+    path("notifications/", notifications, name="notifications"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

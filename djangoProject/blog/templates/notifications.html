@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}
+    Уведомления
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Уведомления</h1>
+        <ul>
+            {% for notification in notifications %}
+                <li>
+                    {% if notification.created_date %}
+                        <strong>Новый комментарий:</strong> {{ notification.text }} ({{ notification.post.title }})
+                    {% else %}
+                        <strong>Новое сообщение:</strong> {{ notification.subject }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+
+        </ul>
+    </div>
+{% endblock %}

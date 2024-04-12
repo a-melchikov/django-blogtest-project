@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Message, Post
+from .models import Message, Post, Comment
 from .forms import PostForm, ProfileForm, CommentForm
 
 
@@ -152,3 +152,16 @@ class AllProfilesView(ListView):
 
     def get_queryset(self):
         return Profile.objects.all()
+    
+@login_required
+def notifications(request):
+    user = request.user
+    comments = Comment.objects.filter(post__author=user)
+    messages = Message.objects.filter(recipient=user)
+    notif = sorted(
+        list(comments) + list(messages),
+        key=lambda notification: notification.timestamp if isinstance(notification, Message) else notification.created_date,
+        reverse=True,
+    )
+    return render(request, "notifications.html", {"notifications": notif})
+

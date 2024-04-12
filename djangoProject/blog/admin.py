@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Message, Comment
+from .models import Notification, Post, Message, Comment
 
 
 @admin.register(Post)
@@ -25,6 +25,7 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ("text",)
     ordering = ("-created_date",)
 
+admin.site.register(Notification)
 
 admin.site.site_header = "Управление блогом"
 admin.site.site_title = "Администрирование"

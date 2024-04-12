@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -13,7 +14,7 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Message, Post, Comment
+from .models import Message, Notification, Post, Comment
 from .forms import PostForm, ProfileForm, CommentForm
 
 
@@ -152,16 +153,28 @@ class AllProfilesView(ListView):
 
     def get_queryset(self):
         return Profile.objects.all()
-    
+
+
 @login_required
 def notifications(request):
     user = request.user
     comments = Comment.objects.filter(post__author=user)
     messages = Message.objects.filter(recipient=user)
-    notif = sorted(
-        list(comments) + list(messages),
-        key=lambda notification: notification.timestamp if isinstance(notification, Message) else notification.created_date,
-        reverse=True,
-    )
-    return render(request, "notifications.html", {"notifications": notif})
 
+    # Проверяем, есть ли уже уведомление о новом сообщении или комментарии для пользователя
+    for comment in comments:
+        if not Notification.objects.filter(Q(user=user) & Q(message=f"Новый комментарий: {comment.text}")).exists():
+            Notification.objects.create(
+                user=user, message=f"Новый комментарий: {comment.text}", is_new=True
+            )
+    
+    for message in messages:
+        if not Notification.objects.filter(Q(user=user) & Q(message=f"Новое сообщение: {message.subject}")).exists():
+            Notification.objects.create(
+                user=user, message=f"Новое сообщение: {message.subject}", is_new=True
+            )
+
+    # Получаем уведомления для текущего пользователя
+    notif = Notification.objects.filter(user=user, is_new=True)
+
+    return render(request, "notifications.html", {"notifications": notif})

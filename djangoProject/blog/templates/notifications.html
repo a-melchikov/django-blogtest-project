@@ -9,11 +9,7 @@
         <ul>
             {% for notification in notifications %}
                 <li>
-                    {% if notification.created_date %}
-                        <strong>Новый комментарий:</strong> {{ notification.text }} ({{ notification.post.title }})
-                    {% else %}
-                        <strong>Новое сообщение:</strong> {{ notification.subject }}
-                    {% endif %}
+                    <strong>{{notification.text}}</strong>
                 </li>
             {% endfor %}
 

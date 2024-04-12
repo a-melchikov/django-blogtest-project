@@ -74,3 +74,19 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    message = models.TextField(verbose_name="Сообщение")
+    timestamp = models.DateTimeField(default=timezone.now, verbose_name="Дата и время")
+    is_new = models.BooleanField(default=True, verbose_name="Новое уведомление")
+
+    class Meta:
+        verbose_name = "Уведомление"
+        verbose_name_plural = "Уведомления"
+
+    def __str__(self):
+        return self.message

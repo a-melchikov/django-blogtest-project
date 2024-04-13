@@ -29,7 +29,7 @@ urlpatterns = [
     path("profile/<str:user_name>/edit/", edit_profile, name="edit_profile"),
     path("my_posts/", my_posts, name="my_posts"),
     path("catalog/", BlogList.as_view(), name="home"),
-    path("", RedirectView.as_view(pattern_name="home", permanent=False)),
+    path("", RedirectView.as_view(pattern_name="home", permanent=False), name="blog_list"),
     path("send_message/", send_message, name="send_message"),
     path("inbox/", inbox, name="inbox"),
     path("notifications/", notifications, name="notifications"),

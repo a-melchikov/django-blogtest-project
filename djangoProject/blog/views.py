@@ -160,6 +160,7 @@ def notifications(request):
     user = request.user
     comments = Comment.objects.filter(post__author=user)
     messages = Message.objects.filter(recipient=user)
+    not_viewed_count = Notification.objects.filter(user=user, viewed=False).count()
 
     # Проверяем, есть ли уже уведомление о новом сообщении или комментарии для пользователя
     for comment in comments:
@@ -186,4 +187,8 @@ def notifications(request):
         Notification.objects.filter(id__in=notification_ids).update(viewed=True)
         return redirect("notifications")
 
-    return render(request, "notifications.html", {"notifications": notif})
+    return render(
+        request,
+        "notifications.html",
+        {"notifications": notif, "notifications_count": not_viewed_count},
+    )

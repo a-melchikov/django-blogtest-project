@@ -85,6 +85,9 @@
                             <li class="nav-item position-relative">
                                 <a href="{% url 'notifications' %}" class="nav-link">
                                     <i class="bi bi-bell text-light fs-4 position-absolute top-0"></i>
+                                    {% if notifications_count > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ notifications_count }}</span>
+                                    {% endif %}
                                 </a>
                             </li>
                             <li class="nav-item">

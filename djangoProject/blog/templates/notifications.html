@@ -11,7 +11,9 @@
             <ul>
                 {% for notification in notifications %}
                     <li>
-                        <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
+                        {% if not notification.viewed %}
+                            <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
+                        {% endif %}
                         <strong>{{ notification }}</strong>
                     </li>
                 {% endfor %}

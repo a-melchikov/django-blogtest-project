@@ -83,6 +83,7 @@ class Notification(models.Model):
     message = models.TextField(verbose_name="Сообщение")
     timestamp = models.DateTimeField(default=timezone.now, verbose_name="Дата и время")
     is_new = models.BooleanField(default=True, verbose_name="Новое уведомление")
+    viewed = models.BooleanField(default=False, verbose_name="Просмотрено")
 
     class Meta:
         verbose_name = "Уведомление"

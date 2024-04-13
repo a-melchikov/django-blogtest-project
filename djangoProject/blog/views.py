@@ -163,18 +163,27 @@ def notifications(request):
 
     # Проверяем, есть ли уже уведомление о новом сообщении или комментарии для пользователя
     for comment in comments:
-        if not Notification.objects.filter(Q(user=user) & Q(message=f"Новый комментарий: {comment.text}")).exists():
+        if not Notification.objects.filter(
+            Q(user=user) & Q(message=f"Новый комментарий: {comment.text}")
+        ).exists():
             Notification.objects.create(
                 user=user, message=f"Новый комментарий: {comment.text}", is_new=True
             )
-    
+
     for message in messages:
-        if not Notification.objects.filter(Q(user=user) & Q(message=f"Новое сообщение: {message.subject}")).exists():
+        if not Notification.objects.filter(
+            Q(user=user) & Q(message=f"Новое сообщение: {message.subject}")
+        ).exists():
             Notification.objects.create(
                 user=user, message=f"Новое сообщение: {message.subject}", is_new=True
             )
 
     # Получаем уведомления для текущего пользователя
     notif = Notification.objects.filter(user=user, is_new=True)
+
+    if request.method == "POST":
+        notification_ids = request.POST.getlist("notification_ids")
+        Notification.objects.filter(id__in=notification_ids).update(viewed=True)
+        return redirect("notifications")
 
     return render(request, "notifications.html", {"notifications": notif})

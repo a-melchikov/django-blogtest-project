@@ -6,13 +6,17 @@
 {% block content %}
     <div class="container">
         <h1>Уведомления</h1>
-        <ul>
-            {% for notification in notifications %}
-                <li>
-                    <strong>{{notification.text}}</strong>
-                </li>
-            {% endfor %}
-
-        </ul>
+        <form method="post">
+            {% csrf_token %}
+            <ul>
+                {% for notification in notifications %}
+                    <li>
+                        <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
+                        <strong>{{ notification }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Отметить как просмотренные</button>
+        </form>
     </div>
 {% endblock %}

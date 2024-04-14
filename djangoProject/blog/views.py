@@ -47,6 +47,16 @@ class BlogDetailView(DetailView):
             comment.post = post
             comment.author = request.user
             comment.save()
+            user = request.user
+            comments = Comment.objects.filter(post__author=user)
+            for com in comments:
+                if not Notification.objects.filter(
+                    Q(user=user) & Q(message=f"Новый комментарий: {com.text}")
+                ).exists():
+                    Notification.objects.create(
+                        user=user, message=f"Новый комментарий: {com.text}", is_new=True
+                    )
+
             return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -133,6 +143,15 @@ def send_message(request):
             body=body,
         )
         message.save()
+        user = request.user
+        messages = Message.objects.filter(recipient=user)
+        for mes in messages:
+            if not Notification.objects.filter(
+                Q(user=user) & Q(message=f"Новое сообщение: {mes.subject}")
+            ).exists():
+                Notification.objects.create(
+                    user=user, message=f"Новое сообщение: {mes.subject}", is_new=True
+                )
         return redirect("inbox")
     else:
         profiles = Profile.objects.all()
@@ -158,28 +177,7 @@ class AllProfilesView(ListView):
 @login_required
 def notifications(request):
     user = request.user
-    comments = Comment.objects.filter(post__author=user)
-    messages = Message.objects.filter(recipient=user)
     not_viewed_count = Notification.objects.filter(user=user, viewed=False).count()
-
-    # Проверяем, есть ли уже уведомление о новом сообщении или комментарии для пользователя
-    for comment in comments:
-        if not Notification.objects.filter(
-            Q(user=user) & Q(message=f"Новый комментарий: {comment.text}")
-        ).exists():
-            Notification.objects.create(
-                user=user, message=f"Новый комментарий: {comment.text}", is_new=True
-            )
-
-    for message in messages:
-        if not Notification.objects.filter(
-            Q(user=user) & Q(message=f"Новое сообщение: {message.subject}")
-        ).exists():
-            Notification.objects.create(
-                user=user, message=f"Новое сообщение: {message.subject}", is_new=True
-            )
-
-    # Получаем уведомления для текущего пользователя
     notif = Notification.objects.filter(user=user, is_new=True)
 
     if request.method == "POST":

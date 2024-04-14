@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     ListView,
@@ -91,11 +91,15 @@ def my_posts(request):
 @login_required
 def edit_profile(request, user_name):
     user = get_object_or_404(User, username=user_name)
+
+    if request.user != user:
+        raise Http404("Вы не имеете прав на редактирование данного профиля")
+
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=user.profile)
         if form.is_valid():
             form.save()
-            return redirect("user_profile", user_name=request.user.username)
+            return redirect("user_profile", user_name=user.username)
     else:
         form = ProfileForm(instance=user.profile)
     return render(request, "edit_profile.html", {"form": form})
@@ -104,6 +108,10 @@ def edit_profile(request, user_name):
 @login_required
 def edit_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
+
+    if request.user != post.author:
+        raise Http404("Вы не имеете прав на редактирование данного поста")
+
     if request.method == "POST":
         form = PostForm(request.POST, instance=post)
         if form.is_valid():

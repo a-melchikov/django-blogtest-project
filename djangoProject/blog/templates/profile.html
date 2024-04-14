@@ -14,6 +14,8 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .avatar {
             margin-right: 20px;
@@ -49,4 +51,23 @@
             <a href="{% url 'all_profiles' %}" class="btn btn-primary">Посмотреть все профили</a>
         </div>
     </div>
+
+    <div class="container">
+        <h1>Посты пользователя {{ user.username }}</h1>
+        <div class="col-md-12">
+            {% for post in user_posts %}
+                <div class="bg-image card mb-4 shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
+                    <div class="card-body text-white">
+                        <h2 class="card-title">{{ post.title }}</h2>
+                        <p class="card-text">{{ post.body }}</p>
+                        <p class="card-text">Автор поста: <b>{{ post.author }}</b></p>
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p>У пользователя пока нет постов.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
 {% endblock %}

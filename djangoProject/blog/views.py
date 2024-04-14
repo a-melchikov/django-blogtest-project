@@ -161,8 +161,9 @@ def send_message(request):
 def user_profile_view(request, user_name):
     # Получаем пользователя по его имени или возвращаем 404 ошибку, если пользователь не найден
     user = get_object_or_404(User, username=user_name)
-    # Здесь можно передать данные о пользователе в шаблон для отображения
-    return render(request, "profile.html", {"user": user})
+    user_posts = Post.objects.filter(author=user)
+    # Здесь можно передать данные о пользователе и его постах в шаблон для отображения
+    return render(request, "profile.html", {"user": user, "user_posts": user_posts})
 
 
 class AllProfilesView(ListView):

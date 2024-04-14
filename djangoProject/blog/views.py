@@ -178,7 +178,7 @@ class AllProfilesView(ListView):
 def notifications(request):
     user = request.user
     not_viewed_count = Notification.objects.filter(user=user, viewed=False).count()
-    notif = Notification.objects.filter(user=user, is_new=True)
+    notif = Notification.objects.filter(user=user, is_new=True)[::-1]
 
     if request.method == "POST":
         notification_ids = request.POST.getlist("notification_ids")

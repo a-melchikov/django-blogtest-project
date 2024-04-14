@@ -14,7 +14,11 @@
                         {% if not notification.viewed %}
                             <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
                         {% endif %}
-                        <strong>{{ notification }}</strong>
+                        <strong>{{ notification }}</strong> 
+                        <span class="notification-details">
+                            <span style="color: blue;">{{ notification.user }}</span>, 
+                            <span style="color: green;">{{ notification.timestamp }}</span>
+                        </span>
                     </li>
                 {% endfor %}
             </ul>

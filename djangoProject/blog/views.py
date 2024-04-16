@@ -96,12 +96,12 @@ def edit_profile(request, user_name):
         raise Http404("Вы не имеете прав на редактирование данного профиля")
 
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=user.profile)
+        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
-            return redirect("user_profile", user_name=user.username)
+            return redirect("user_profile", user_name=request.user.username)
     else:
-        form = ProfileForm(instance=user.profile)
+        form = ProfileForm(instance=request.user.profile)
     return render(request, "edit_profile.html", {"form": form})
 
 

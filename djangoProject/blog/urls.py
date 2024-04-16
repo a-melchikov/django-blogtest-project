@@ -1,7 +1,5 @@
 from django.urls import path
 from django.views.generic.base import RedirectView
-from django.conf import settings
-from django.conf.urls.static import static
 from .views import (
     AboutPageView,
     AllProfilesView,
@@ -29,10 +27,10 @@ urlpatterns = [
     path("profile/<str:user_name>/edit/", edit_profile, name="edit_profile"),
     path("my_posts/", my_posts, name="my_posts"),
     path("catalog/", BlogList.as_view(), name="home"),
-    path("", RedirectView.as_view(pattern_name="home", permanent=False), name="blog_list"),
+    path(
+        "", RedirectView.as_view(pattern_name="home", permanent=False), name="blog_list"
+    ),
     path("send_message/", send_message, name="send_message"),
     path("inbox/", inbox, name="inbox"),
     path("notifications/", notifications, name="notifications"),
 ]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

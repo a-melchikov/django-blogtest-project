@@ -162,3 +162,4 @@ cython_debug/
 .vscode
 my_base.db
 .pylintrc
+avatars

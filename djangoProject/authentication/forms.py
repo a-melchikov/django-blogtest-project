@@ -20,4 +20,4 @@ class UserForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ["avatar"]
+        fields = ["date_of_birth", "country", "city", "bio", "avatar"]

@@ -1,13 +1,19 @@
 from django import forms
 
 from authentication.models import Profile
-from .models import Comment, Post
+from .models import Comment, Post, Category
 
 
 class PostForm(forms.ModelForm):
+    categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
     class Meta:
         model = Post
-        fields = ["title", "body"]
+        fields = ["title", "body", "categories"]
 
 
 class ProfileForm(forms.ModelForm):

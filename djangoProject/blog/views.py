@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Message, Notification, Post, Comment
+from .models import Category, Message, Notification, Post, Comment
 from .forms import PostForm, ProfileForm, CommentForm
 
 
@@ -47,6 +47,9 @@ class BlogDetailView(DetailView):
             comment.post = post
             comment.author = request.user
             comment.save()
+            categories = request.POST.getlist("categories")
+            if categories:
+                post.categories.add(*categories)
             user = request.user
             comments = Comment.objects.filter(post__author=user)
             for com in comments:
@@ -56,7 +59,6 @@ class BlogDetailView(DetailView):
                     Notification.objects.create(
                         user=user, message=f"Новый комментарий: {com.text}", is_new=True
                     )
-
             return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -77,7 +79,8 @@ def create_post(request):
             return redirect("home")
     else:
         form = PostForm()
-    return render(request, "create_post.html", {"form": form})
+    categories = Category.objects.all()
+    return render(request, "create_post.html", {"form": form, "categories": categories})
 
 
 @login_required
@@ -119,7 +122,8 @@ def edit_post(request, pk):
             return redirect("my_posts")
     else:
         form = PostForm(instance=post)
-    return render(request, "edit_post.html", {"form": form})
+    categories = Category.objects.all()
+    return render(request, "edit_post.html", {"form": form, "categories": categories})
 
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):

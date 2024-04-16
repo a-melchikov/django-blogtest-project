@@ -3,6 +3,18 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    description = models.TextField(verbose_name="Описание")
+
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
+
+    def __str__(self):
+        return self.name
+
+
 class Post(models.Model):
     title = models.CharField(max_length=450, verbose_name="Заголовок")
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор")
@@ -10,6 +22,7 @@ class Post(models.Model):
     publish_date = models.DateTimeField(
         default=timezone.now, verbose_name="Дата публикации"
     )
+    categories = models.ManyToManyField(Category, verbose_name="Категории")
 
     class Meta:
         verbose_name = "Пост"

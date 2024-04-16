@@ -33,6 +33,14 @@
                 <label for="body" class="form-label">Содержание</label>
                 <textarea class="form-control" id="body" name="body" rows="5"></textarea>
             </div>
+            <div class="mb-3">
+                <label for="categories" class="form-label">Выберите категории</label>
+                <select class="form-select" id="categories" name="categories" multiple>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary">Отправить</button>
         </form>
     </div>

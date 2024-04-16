@@ -65,6 +65,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "blog.context_processors.notifications_count",
+                "blog.context_processors.categories",
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",

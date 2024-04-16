@@ -48,12 +48,9 @@
                                 Разделы блога
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item {% if request.path == '/pozn/' %}active{% endif %}" href="/first/">Первый раздел</a></li>
-                                <li><a class="dropdown-item {% if request.path == '/len/' %}active{% endif %}" href="/second/">Второй раздел</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item {% if request.path == '/superlren/' %}active{% endif %}" href="/more/">Особый раздел</a></li>
+                                {% for category in categories %}
+                                    <li><a class="dropdown-item {% if request.path == '/{{ category.slug }}/' %}active{% endif %}" href="/{{ category.slug }}/">{{ category.name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </li>
                         {% if user.is_authenticated %}

@@ -17,6 +17,14 @@
                         <label for="id_body" class="form-label">Содержание</label>
                         {{ form.body }}
                     </div>
+                    <div class="mb-3">
+                        <label for="categories" class="form-label">Выберите категории</label>
+                        <select class="form-select" id="categories" name="categories" multiple>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category in form.categories.value %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">Сохранить изменения</button>
                     </div>

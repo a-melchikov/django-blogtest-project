@@ -181,6 +181,7 @@ def send_message(request):
         return render(request, "send_message.html", {"profiles": profiles})
 
 
+@login_required
 def user_profile_view(request, user_name):
     # Получаем пользователя по его имени или возвращаем 404 ошибку, если пользователь не найден
     user = get_object_or_404(User, username=user_name)
@@ -227,3 +228,16 @@ def category_posts(request, category_slug):
         "posts": posts,
     }
     return render(request, "category_posts.html", context)
+
+
+def search_posts(request):
+    query = request.GET.get("query")
+    if query:
+        posts = Post.objects.filter(
+            Q(title__icontains=query)
+            | Q(body__icontains=query)
+            | Q(author__username__icontains=query)
+        ).distinct()
+    else:
+        posts = Post.objects.all()
+    return render(request, "search_results.html", {"posts": posts})

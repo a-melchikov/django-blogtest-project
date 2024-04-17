@@ -11,6 +11,7 @@ from .views import (
     edit_post,
     edit_profile,
     my_posts,
+    search_posts,
     send_message,
     inbox,
     user_profile_view,
@@ -35,4 +36,5 @@ urlpatterns = [
     path("inbox/", inbox, name="inbox"),
     path("notifications/", notifications, name="notifications"),
     path('catalog/<slug:category_slug>/', category_posts, name='category_posts'),
+    path('search/', search_posts, name='search_posts'),
 ]

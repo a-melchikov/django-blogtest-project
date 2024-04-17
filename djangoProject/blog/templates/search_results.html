@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Результаты поиска
+{% endblock %}
+
+{% block content %}
+<style>
+    .user-info h2 a {
+        text-decoration: none;
+        color: #0366d6;
+        transition: color 0.3s ease; 
+    }
+    .user-info h2 a:hover {
+        color: #05529b;
+    }
+</style>
+
+<h1>Результаты поиска</h1>
+{% if posts %}
+    {% for post in posts %}
+        <div style="margin-top: 1%">
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="bg-image card shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
+                        <div class="card-body text-white">
+                            <h2>{{ post.title }}</h2>
+                            {% if post.categories.exists %}
+                                <p>Категории: 
+                                    {% for category in post.categories.all %}
+                                        <b>{{ category.name }}</b>{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% else %}
+                                <p>Категории не выбраны</p>
+                            {% endif %}
+                            <p>Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b></p>
+                            <p>Дата публикации: {{ post.publish_date }}</p>
+                            <p>{{ post.body }}</p>
+                            <a href="{% url 'post_detail' post.pk %}">
+                                <button type="button" class="btn btn-primary">Подробнее</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>По вашему запросу ничего не найдено.</p>
+{% endif %}
+{% endblock %}

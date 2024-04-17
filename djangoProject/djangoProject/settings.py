@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "channels",
+    "autoslug",
     "chat.apps.ChatConfig",
     "authentication.apps.AuthenticationConfig",
     "blog.apps.BlogConfig",

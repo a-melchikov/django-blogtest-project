@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from .models import Category, Notification, Post, Message, Comment
 
@@ -26,7 +27,12 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ("text",)
     ordering = ("-created_date",)
 
-admin.site.register(Category)
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+
+
 admin.site.register(Notification)
 
 admin.site.site_header = "Управление блогом"

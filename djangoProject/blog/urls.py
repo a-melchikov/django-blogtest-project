@@ -6,6 +6,7 @@ from .views import (
     BlogDetailView,
     BlogList,
     PostDeleteView,
+    category_posts,
     create_post,
     edit_post,
     edit_profile,
@@ -33,4 +34,5 @@ urlpatterns = [
     path("send_message/", send_message, name="send_message"),
     path("inbox/", inbox, name="inbox"),
     path("notifications/", notifications, name="notifications"),
+    path('catalog/<slug:category_slug>/', category_posts, name='category_posts'),
 ]

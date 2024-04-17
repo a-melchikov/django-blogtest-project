@@ -49,7 +49,7 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 {% for category in categories %}
-                                    <li><a class="dropdown-item {% if request.path == '/{{ category.slug }}/' %}active{% endif %}" href="/{{ category.slug }}/">{{ category.name }}</a></li>
+                                    <li><a class="dropdown-item {% if request.get_full_path == '/catalog/'|add:category.slug %}/' %}active{% endif %}" href="/catalog/{{ category.slug }}/">{{ category.name }}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>

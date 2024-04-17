@@ -203,3 +203,13 @@ def notifications(request):
         "notifications.html",
         {"notifications": notif, "notifications_count": not_viewed_count},
     )
+
+
+def category_posts(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    posts = Post.objects.filter(categories=category)
+    context = {
+        "category": category,
+        "posts": posts,
+    }
+    return render(request, "category_posts.html", context)

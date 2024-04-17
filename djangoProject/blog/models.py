@@ -1,3 +1,4 @@
+from autoslug import AutoSlugField
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -6,6 +7,7 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
+    slug = AutoSlugField(populate_from="name", unique=True, null=True, verbose_name="Slug")
 
     class Meta:
         verbose_name = "Категория"

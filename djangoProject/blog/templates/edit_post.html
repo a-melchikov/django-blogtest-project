@@ -39,12 +39,12 @@
                         <div>
                             {% for category in categories %}
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category_{{ category.id }}" name="categories" value="{{ category.id }}" {% if category in form.categories.value %}checked{% endif %}>
+                                    <input class="form-check-input" type="checkbox" id="category_{{ category.id }}" name="categories" value="{{ category.id }}" {% if category in selected_categories %}checked{% endif %}>
                                     <label class="form-check-label" for="category_{{ category.id }}">{{ category.name }}</label>
                                 </div>
                             {% endfor %}
                         </div>
-                    </div>
+                    </div>                    
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">Сохранить изменения</button>
                     </div>

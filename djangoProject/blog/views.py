@@ -122,8 +122,19 @@ def edit_post(request, pk):
             return redirect("my_posts")
     else:
         form = PostForm(instance=post)
+
+    selected_categories = post.categories.all()
+
     categories = Category.objects.all()
-    return render(request, "edit_post.html", {"form": form, "categories": categories})
+    return render(
+        request,
+        "edit_post.html",
+        {
+            "form": form,
+            "categories": categories,
+            "selected_categories": selected_categories,
+        },
+    )
 
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):

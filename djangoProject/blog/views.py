@@ -204,6 +204,9 @@ def notifications(request):
     not_viewed_count = Notification.objects.filter(user=user, viewed=False).count()
     notif = Notification.objects.filter(user=user, is_new=True)[::-1]
 
+    for notification in notif:
+        notification.type, notification.text = str(notification).split(":")
+
     if request.method == "POST":
         notification_ids = request.POST.getlist("notification_ids")
         Notification.objects.filter(id__in=notification_ids).update(viewed=True)

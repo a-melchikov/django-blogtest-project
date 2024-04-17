@@ -8,21 +8,33 @@
         <h1>Уведомления</h1>
         <form method="post">
             {% csrf_token %}
-            <ul>
-                {% for notification in notifications %}
-                    <li>
-                        {% if not notification.viewed %}
-                            <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
-                        {% endif %}
-                        <strong>{{ notification }}</strong> 
-                        <span class="notification-details">
-                            <span style="color: blue;">{{ notification.user }}</span>, 
-                            <span style="color: green;">{{ notification.timestamp }}</span>
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
-            <button type="submit">Отметить как просмотренные</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Просмотрено</th>
+                        <th scope="col">Тип</th>
+                        <th scope="col">Текст</th>
+                        <th scope="col">Пользователь</th>
+                        <th scope="col">Время</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notification in notifications %}
+                        <tr>
+                            <td>
+                                {% if not notification.viewed %}
+                                    <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ notification.type }}</strong></td>
+                            <td>{{ notification.text }}</td>
+                            <td><span style="color: blue;">{{ notification.user }}</span></td>
+                            <td><span style="color: green;">{{ notification.timestamp }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Отметить как просмотренные</button>
         </form>
     </div>
 {% endblock %}

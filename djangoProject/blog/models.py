@@ -96,6 +96,8 @@ class Notification(models.Model):
         User, on_delete=models.CASCADE, verbose_name="Пользователь"
     )
     message = models.TextField(verbose_name="Сообщение")
+    text = models.CharField(max_length=255, null=True)
+    type = models.CharField(max_length=255, null=True)
     timestamp = models.DateTimeField(default=timezone.now, verbose_name="Дата и время")
     is_new = models.BooleanField(default=True, verbose_name="Новое уведомление")
     viewed = models.BooleanField(default=False, verbose_name="Просмотрено")

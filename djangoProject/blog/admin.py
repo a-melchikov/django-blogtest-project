@@ -5,9 +5,10 @@ from .models import Category, Notification, Post, Message, Comment
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ("title", "author", "publish_date")
-    list_filter = ("author", "publish_date")
+    list_filter = ("author", "publish_date", "categories")
     search_fields = ("title", "body")
     ordering = ("-publish_date",)
+    filter_horizontal = ("categories",)
 
 
 @admin.register(Message)

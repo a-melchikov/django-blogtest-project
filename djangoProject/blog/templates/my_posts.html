@@ -10,7 +10,15 @@
                     <div class="card-body text-white">
                         <h2 class="card-title">{{ post.title }}</h2>
                         <p class="card-text">{{ post.body }}</p>
-                        <p class="card-text">Категория: <b>{{ post.category }}</b></p>  <!-- Добавление категории -->
+                        {% if post.categories.exists %}
+                            <p>Категории: 
+                                {% for category in post.categories.all %}
+                                    <b>{{ category.name }}</b>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        {% else %}
+                            <p>Категории не выбраны</p>
+                        {% endif %}
                         <p class="card-text">Автор поста: <b>{{ post.author }}</b></p>
                         <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                         <a href="{% url 'edit_post' post.pk %}" class="btn btn-secondary">Редактировать</a>

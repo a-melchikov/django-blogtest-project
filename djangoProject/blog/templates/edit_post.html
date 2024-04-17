@@ -1,8 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Редактирование поста{% endblock %}
+{% block title %}
+    Редактирование поста
+{% endblock %}
 
 {% block content %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            margin-top: 20px;
+        }
+    </style>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -15,15 +32,18 @@
                     </div>
                     <div class="mb-3">
                         <label for="id_body" class="form-label">Содержание</label>
-                        {{ form.body }}
+                        <textarea class="form-control" id="id_body" name="body" rows="5">{{ form.body.value }}</textarea>
                     </div>
                     <div class="mb-3">
                         <label for="categories" class="form-label">Выберите категории</label>
-                        <select class="form-select" id="categories" name="categories" multiple>
+                        <div>
                             {% for category in categories %}
-                                <option value="{{ category.id }}" {% if category in form.categories.value %}selected{% endif %}>{{ category.name }}</option>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="category_{{ category.id }}" name="categories" value="{{ category.id }}" {% if category in form.categories.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="category_{{ category.id }}">{{ category.name }}</label>
+                                </div>
                             {% endfor %}
-                        </select>
+                        </div>
                     </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">Сохранить изменения</button>

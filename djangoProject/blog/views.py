@@ -76,11 +76,11 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            form.save_m2m()
             return redirect("home")
     else:
         form = PostForm()
-    categories = Category.objects.all()
-    return render(request, "create_post.html", {"form": form, "categories": categories})
+    return render(request, "create_post.html", {"form": form})
 
 
 @login_required

@@ -16,13 +16,16 @@
                                 <form method="post" action="{% url 'like_post' post.pk %}">
                                     {% csrf_token %}
                                     {% if user in post.likes.all %}
-                                        <button type="submit" class="btn btn-secondary">Лайк</button>
+                                        <button type="submit" class="btn btn-secondary">
+                                            <span class="bi bi-heart-fill"></span> {{ post.likes.count }}
+                                        </button>
                                     {% else %}
-                                        <button type="submit" class="btn btn-primary">Лайк</button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <span class="bi bi-heart"></span> {{ post.likes.count }}
+                                        </button>
                                     {% endif %}
                                 </form>
-                            {% endif %}
-                            <p>Количество лайков: {{ post.likes.count }}</p>                  
+                            {% endif %}             
                         </div>
                     </div>
                 </div>

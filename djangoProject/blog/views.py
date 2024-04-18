@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
+from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 from django.views.generic import (
     ListView,
     DetailView,
@@ -21,9 +22,25 @@ from .forms import PostForm, ProfileForm, CommentForm
 class BlogList(ListView):
     model = Post
     template_name = "home.html"
+    context_object_name = "posts"
+    paginate_by = 5
+    ordering = "-publish_date"
 
     def get_queryset(self):
-        return Post.objects.all().order_by('-publish_date')
+        return Post.objects.all().order_by(self.ordering)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(context['posts'], self.paginate_by)
+        page_number = self.request.GET.get('page')
+        try:
+            page_obj = paginator.get_page(page_number)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        context['posts'] = page_obj
+        return context
 
 
 class BlogDetailView(DetailView):
@@ -87,7 +104,7 @@ def create_post(request):
 def my_posts(request):
     # Получаем все посты текущего пользователя
     user = request.user
-    user_posts = Post.objects.filter(author=user).order_by('-publish_date')
+    user_posts = Post.objects.filter(author=user).order_by("-publish_date")
     return render(request, "my_posts.html", {"user_posts": user_posts})
 
 
@@ -233,11 +250,15 @@ def category_posts(request, category_slug):
 def search_posts(request):
     query = request.GET.get("query")
     if query:
-        posts = Post.objects.filter(
-            Q(title__icontains=query)
-            | Q(body__icontains=query)
-            | Q(author__username__icontains=query)
-        ).distinct().order_by("-publish_date")
+        posts = (
+            Post.objects.filter(
+                Q(title__icontains=query)
+                | Q(body__icontains=query)
+                | Q(author__username__icontains=query)
+            )
+            .distinct()
+            .order_by("-publish_date")
+        )
     else:
         posts = Post.objects.all().order_by("-publish_date")
     return render(request, "search_results.html", {"posts": posts})

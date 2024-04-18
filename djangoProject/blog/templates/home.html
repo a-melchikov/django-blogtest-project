@@ -6,6 +6,11 @@
 
 {% block content %}
 <style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+    }
+
     .user-info h2 a {
         text-decoration: none;
         color: #0366d6;
@@ -23,7 +28,7 @@
     <button type="submit" class="btn btn-primary">Найти</button>
 </form>
 
-{% for post in object_list %}
+{% for post in posts %}
     <div style="margin-top: 1%">
         <div class="row align-items-start">
             <div class="col">
@@ -42,13 +47,33 @@
                         <p>Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b></p>
                         <p>Дата публикации: {{ post.publish_date }}</p>
                         <p>{{ post.body }}</p>
-                        <a href="{% url 'post_detail' post.pk %}">
-                            <button type="button" class="btn btn-primary">Подробнее</button>
-                        </a>
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% empty %}
+    <p>Постов пока нет.</p>
 {% endfor %}
+
+<!-- Pagination links -->
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="btn btn-secondary">&laquo; первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">предыдущая</a>
+        {% endif %}
+
+        <span class="current">
+            <b>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</b>
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
 {% endblock %}

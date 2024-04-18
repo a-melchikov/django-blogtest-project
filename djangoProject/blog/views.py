@@ -23,7 +23,7 @@ class BlogList(ListView):
     template_name = "home.html"
 
     def get_queryset(self):
-        return Post.objects.all()
+        return Post.objects.all().order_by('-publish_date')
 
 
 class BlogDetailView(DetailView):
@@ -87,7 +87,7 @@ def create_post(request):
 def my_posts(request):
     # Получаем все посты текущего пользователя
     user = request.user
-    user_posts = Post.objects.filter(author=user)
+    user_posts = Post.objects.filter(author=user).order_by('-publish_date')
     return render(request, "my_posts.html", {"user_posts": user_posts})
 
 
@@ -185,7 +185,7 @@ def send_message(request):
 def user_profile_view(request, user_name):
     # Получаем пользователя по его имени или возвращаем 404 ошибку, если пользователь не найден
     user = get_object_or_404(User, username=user_name)
-    user_posts = Post.objects.filter(author=user)
+    user_posts = Post.objects.filter(author=user).order_by("-publish_date")
     # Здесь можно передать данные о пользователе и его постах в шаблон для отображения
     return render(request, "profile.html", {"user": user, "user_posts": user_posts})
 

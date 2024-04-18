@@ -60,8 +60,7 @@
             {% for post in user_posts %}
                 <div class="bg-image card mb-4 shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
                     <div class="card-body text-white">
-                        <h2 class="card-title">{{ post.title }}</h2>
-                        <p class="card-text">{{ post.body }}</p>
+                        <h2>{{ post.title }}</h2>
                         {% if post.categories.exists %}
                             <p>Категории: 
                                 {% for category in post.categories.all %}
@@ -71,7 +70,9 @@
                         {% else %}
                             <p>Категории не выбраны</p>
                         {% endif %}
-                        <p class="card-text">Автор поста: <b>{{ post.author }}</b></p>
+                        <p>Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b></p>
+                        <p>Дата публикации: {{ post.publish_date }}</p>
+                        <p>{{ post.body }}</p>
                         <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                     </div>
                 </div>

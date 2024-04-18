@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 from django.views.generic import (
@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Category, Message, Notification, Post, Comment
+from .models import Category, Like, Message, Notification, Post, Comment
 from .forms import PostForm, ProfileForm, CommentForm
 
 
@@ -31,15 +31,15 @@ class BlogList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(context['posts'], self.paginate_by)
-        page_number = self.request.GET.get('page')
+        paginator = Paginator(context["posts"], self.paginate_by)
+        page_number = self.request.GET.get("page")
         try:
             page_obj = paginator.get_page(page_number)
         except PageNotAnInteger:
             page_obj = paginator.page(1)
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
-        context['posts'] = page_obj
+        context["posts"] = page_obj
         return context
 
 
@@ -262,3 +262,14 @@ def search_posts(request):
     else:
         posts = Post.objects.all().order_by("-publish_date")
     return render(request, "search_results.html", {"posts": posts})
+
+@login_required
+def like_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    user = request.user
+    if request.method == 'POST':
+        if user in post.likes.all():
+            post.likes.remove(user)
+        else:
+            post.likes.add(user)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

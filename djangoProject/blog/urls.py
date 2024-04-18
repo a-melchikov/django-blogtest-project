@@ -10,6 +10,7 @@ from .views import (
     create_post,
     edit_post,
     edit_profile,
+    like_post,
     my_posts,
     search_posts,
     send_message,
@@ -20,6 +21,7 @@ from .views import (
 
 urlpatterns = [
     path("post/<int:pk>/", BlogDetailView.as_view(), name="post_detail"),
+    path('post/<int:pk>/like/', like_post, name='like_post'),
     path("post/delete/<int:pk>/", PostDeleteView.as_view(), name="delete_post"),
     path("post/edit/<int:pk>/", edit_post, name="edit_post"),
     path("about/", AboutPageView.as_view(), name="about"),

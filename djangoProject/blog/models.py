@@ -7,7 +7,9 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
-    slug = AutoSlugField(populate_from="name", unique=True, null=True, verbose_name="Slug")
+    slug = AutoSlugField(
+        populate_from="name", unique=True, null=True, verbose_name="Slug"
+    )
 
     class Meta:
         verbose_name = "Категория"
@@ -25,6 +27,7 @@ class Post(models.Model):
         default=timezone.now, verbose_name="Дата публикации"
     )
     categories = models.ManyToManyField(Category, verbose_name="Категории")
+    likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
 
     class Meta:
         verbose_name = "Пост"
@@ -108,3 +111,18 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.message
+
+
+class Like(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name="Пост")
+    like = models.BooleanField(default=True, verbose_name="Лайк")
+
+    class Meta:
+        verbose_name = "Лайк"
+        verbose_name_plural = "Лайки"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.post.title} - {'Лайк' if self.like else 'Дизлайк'}"

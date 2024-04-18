@@ -11,13 +11,25 @@
                         <div class="card-body text-white">
                             <h2>{{ post.title }}</h2>
                             <p>Автор поста: <b>{{ post.author }}</b></p>
-                            <p>{{ post.body }}</p>                     
+                            <p>{{ post.body }}</p>   
+                            {% if user.is_authenticated %}
+                                <form method="post" action="{% url 'like_post' post.pk %}">
+                                    {% csrf_token %}
+                                    {% if user in post.likes.all %}
+                                        <button type="submit" class="btn btn-secondary">Лайк</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-primary">Лайк</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                            <p>Количество лайков: {{ post.likes.count }}</p>                  
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <div style="margin-top: 20px;">
         <h2>Комментарии</h2>

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import Category, Notification, Post, Message, Comment
+from .models import Category, Like, Notification, Post, Message, Comment
 
 
 @admin.register(Post)
@@ -34,6 +34,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Notification)
+admin.site.register(Like)
 
 admin.site.site_header = "Управление блогом"
 admin.site.site_title = "Администрирование"

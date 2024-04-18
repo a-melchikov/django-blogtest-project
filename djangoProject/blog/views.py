@@ -222,7 +222,7 @@ def notifications(request):
 
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-    posts = Post.objects.filter(categories=category)
+    posts = Post.objects.filter(categories=category).order_by("-publish_date")
     context = {
         "category": category,
         "posts": posts,
@@ -237,7 +237,7 @@ def search_posts(request):
             Q(title__icontains=query)
             | Q(body__icontains=query)
             | Q(author__username__icontains=query)
-        ).distinct()
+        ).distinct().order_by("-publish_date")
     else:
-        posts = Post.objects.all()
+        posts = Post.objects.all().order_by("-publish_date")
     return render(request, "search_results.html", {"posts": posts})

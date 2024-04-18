@@ -5,6 +5,9 @@ from django.conf import settings
 class ChatRoom(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class Message(models.Model):
     room = models.ForeignKey(

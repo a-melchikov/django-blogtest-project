@@ -4,13 +4,22 @@
 
 {% block content %}
 <div id="chat-room">
+    <div>
+        <label for="room-select">Выберите комнату:</label>
+        <select id="room-select">
+            {% for room in rooms %}
+                <option value="{{ room.name }}">{{ room.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button onclick="createRoom()">Создать комнату</button>
     <ul id="messages"></ul>
     <input type="text" id="message-input">
     <button onclick="sendMessage()">Отправить</button>
 </div>
 
 <script>
-    const roomName = '{{ room_name }}';
+    var selectedRoom = document.getElementById('room-select').value;
     const username = '{{ user.username }}';
 
     var wsStart = 'ws://';
@@ -19,7 +28,7 @@
     }
     var chatSocket = new WebSocket(
         wsStart + window.location.host +
-        '/ws/chat/' + roomName + '/'
+        '/ws/chat/' + selectedRoom + '/'
     );
 
     chatSocket.onmessage = function(e) {
@@ -32,12 +41,62 @@
     function sendMessage() {
         const messageInputDom = document.getElementById('message-input');
         const message = messageInputDom.value;
+        
+        // Проверяем, выбрана ли комната
+        if (selectedRoom === '') {
+            alert('Выберите комнату перед отправкой сообщения.');
+            return;
+        }
+        
         chatSocket.send(JSON.stringify({
             'message': message,
             'username': username,
-            'room_name': roomName
+            'room_name': selectedRoom
         }));
         messageInputDom.value = '';
+    }
+    
+
+    document.getElementById('room-select').addEventListener('change', function() {
+        selectedRoom = this.value;
+        chatSocket.close();
+        chatSocket = new WebSocket(
+            wsStart + window.location.host +
+            '/ws/chat/' + selectedRoom + '/'
+        );
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            $('#messages').append(
+                '<li><strong>' + data.username + '</strong>: ' + data.message + '</li>'
+            );
+        };
+    });
+
+    function createRoom() {
+        var roomName = prompt("Введите название комнаты:");
+        if (roomName != null) {
+            // Отправляем запрос на создание комнаты на сервер
+            fetch("{% url 'create_room' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    name: roomName
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка создания комнаты');
+                }
+                // Обновляем список комнат
+                location.reload();
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
     }
 </script>
 {% endblock %}

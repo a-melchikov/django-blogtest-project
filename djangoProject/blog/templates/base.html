@@ -11,22 +11,33 @@
     <style>
         .background-area {
             height: 100vh;
-            background: linear-gradient(90deg, rgba(68,68,82,1) 0%, rgba(215,215,228,1) 64%, rgba(77,95,98,1) 100%);
+            background-color: #C6C3B5; /* Темно-серый фон */
             padding: 40px;
         }
         .username {
-            color: #ffcc00;
+            color: #ffffff; /* Белый текст имени пользователя */
             font-weight: bold;
             font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
-        
+        .navbar-dark .navbar-nav .nav-link {
+            color: #ffffff; /* Белый текст ссылок в меню */
+        }
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #007bff; /* Цвет текста ссылок в меню при наведении */
+        }
+        .navbar-dark .navbar-brand {
+            color: #ffffff; /* Белый текст бренда в меню */
+            font-weight: bold;
+        }
+        .navbar-dark .navbar-toggler-icon {
+            background-color: #ffffff; /* Белый цвет иконки меню */
+        }
     </style>
 </head>
 <body>
-<div class="g-image" style="background: linear-gradient(90deg, rgba(68,68,82,1) 0%, rgba(215,215,228,1) 64%, rgba(77,95,98,1) 100%); background-size: 100%;">
+<div class="g-image" style="background-color: #C6C3B5; background-size: 100%;">
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
@@ -72,11 +83,8 @@
                             <li class="nav-item {% if request.path == '/chat/' %}active{% endif %}">
                                 <a href="{% url 'chat' %}" class="nav-link">Чат</a>
                             </li>
-                            
-
                         {% endif %}
                     </ul>
-                    
                     {% block extra_nav_content %}
                         {% if request.user.is_authenticated %}
                             <li class="nav-item position-relative">
@@ -100,9 +108,6 @@
                             <a href="{% url 'login' %}" class="btn btn-outline-light">Войти</a>
                         {% endif %}
                     {% endblock %}
-
-
-
                 </div>
             </div>
         </nav>

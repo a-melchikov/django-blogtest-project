@@ -8,6 +8,7 @@ from .views import (
     PostDeleteView,
     category_posts,
     create_post,
+    delete_notification,
     edit_post,
     edit_profile,
     like_post,
@@ -21,7 +22,7 @@ from .views import (
 
 urlpatterns = [
     path("post/<int:pk>/", BlogDetailView.as_view(), name="post_detail"),
-    path('post/<int:pk>/like/', like_post, name='like_post'),
+    path("post/<int:pk>/like/", like_post, name="like_post"),
     path("post/delete/<int:pk>/", PostDeleteView.as_view(), name="delete_post"),
     path("post/edit/<int:pk>/", edit_post, name="edit_post"),
     path("about/", AboutPageView.as_view(), name="about"),
@@ -37,6 +38,11 @@ urlpatterns = [
     path("send_message/", send_message, name="send_message"),
     path("inbox/", inbox, name="inbox"),
     path("notifications/", notifications, name="notifications"),
-    path('catalog/<slug:category_slug>/', category_posts, name='category_posts'),
-    path('search/', search_posts, name='search_posts'),
+    path("catalog/<slug:category_slug>/", category_posts, name="category_posts"),
+    path("search/", search_posts, name="search_posts"),
+    path(
+        "delete_notification/<int:notification_id>/",
+        delete_notification,
+        name="delete_notification",
+    ),
 ]

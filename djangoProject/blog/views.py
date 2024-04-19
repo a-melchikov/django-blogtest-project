@@ -1,6 +1,7 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 from django.views.generic import (
@@ -286,3 +287,14 @@ def like_post(request, pk):
         else:
             post.likes.add(user)
     return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
+
+
+@login_required
+def delete_notification(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id)
+    if request.user == notification.user:
+        notification.delete()
+        messages.success(request, 'Уведомление успешно удалено.')
+        return redirect('notifications')
+    else:
+        return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")

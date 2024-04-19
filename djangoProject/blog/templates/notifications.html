@@ -16,6 +16,7 @@
                         <th scope="col">Текст</th>
                         <th scope="col">Пользователь</th>
                         <th scope="col">Время</th>
+                        <th scope="col">Действия</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +31,9 @@
                             <td>{{ notification.text }}</td>
                             <td><span style="color: blue;">{{ notification.sender_name }}</span></td>
                             <td><span style="color: green;">{{ notification.timestamp }}</span></td>
+                            <td>
+                                <button type="button" class="btn btn-danger" onclick="deleteNotification({{ notification.id }})">Удалить</button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -37,4 +41,25 @@
             <button type="submit" class="btn btn-primary">Отметить как просмотренные</button>
         </form>
     </div>
+
+    <script>
+        function deleteNotification(notificationId) {
+            if (confirm("Вы уверены, что хотите удалить это уведомление?")) {
+                fetch(`/delete_notification/${notificationId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        console.error('Failed to delete notification');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
 {% endblock %}

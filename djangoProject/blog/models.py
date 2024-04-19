@@ -1,5 +1,6 @@
 from autoslug import AutoSlugField
 from django.db import models
+from django.template import Node
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -27,7 +28,7 @@ class Post(models.Model):
         default=timezone.now, verbose_name="Дата публикации"
     )
     categories = models.ManyToManyField(Category, verbose_name="Категории")
-    likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
+    likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
 
     class Meta:
         verbose_name = "Пост"
@@ -96,8 +97,19 @@ class Comment(models.Model):
 
 class Notification(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="received_notifications",
     )
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Отправитель",
+        related_name="sent_notifications",
+        default=None,
+    )
+    sender_name = models.CharField(max_length=255, default="", verbose_name="Имя отправителя")  # Add a default value
     message = models.TextField(verbose_name="Сообщение")
     text = models.CharField(max_length=255, null=True)
     type = models.CharField(max_length=255, null=True)
@@ -111,6 +123,7 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.message
+
 
 
 class Like(models.Model):

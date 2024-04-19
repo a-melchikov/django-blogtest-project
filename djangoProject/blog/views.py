@@ -67,15 +67,22 @@ class BlogDetailView(DetailView):
             categories = request.POST.getlist("categories")
             if categories:
                 post.categories.add(*categories)
+
+            sender_name = request.user.username
+
             user = request.user
             comments = Comment.objects.filter(post__author=user)
             comments = Comment.objects.filter(post=post)
             for com in comments:
                 if not Notification.objects.filter(
-                    Q(user=com.post.author) & Q(message=f"Новый комментарий: {com.text}")
+                    Q(user=com.post.author)
+                    & Q(message=f"Новый комментарий: {com.text}")
                 ).exists():
                     Notification.objects.create(
-                        user=com.post.author, message=f"Новый комментарий: {com.text}", is_new=True
+                        user=com.post.author,
+                        sender_name=sender_name,
+                        message=f"Новый комментарий: {com.text}",
+                        is_new=True,
                     )
             return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))
         else:
@@ -177,22 +184,26 @@ def send_message(request):
         recipient = request.POST["recipient"]
         subject = request.POST["subject"]
         body = request.POST["body"]
+
+        sender = request.user
+
         message = Message(
-            sender=request.user,
+            sender=sender,
             recipient=Profile.objects.get(user__username=recipient).user,
             subject=subject,
             body=body,
         )
         message.save()
-        user = request.user
-        messages = Message.objects.filter(sender=request.user)
-        for mes in messages:
-            if not Notification.objects.filter(
-                Q(user=mes.recipient) & Q(message=f"Новое сообщение: {mes.subject}")
-            ).exists():
-                Notification.objects.create(
-                    user=mes.recipient, message=f"Новое сообщение: {mes.subject}", is_new=True
-                )
+
+        sender_name = sender.username
+        Notification.objects.create(
+            user=message.recipient,
+            sender=sender,
+            sender_name=sender_name,
+            message=f"Новое сообщение: {message.subject}",
+            is_new=True,
+        )
+
         return redirect("inbox")
     else:
         profiles = Profile.objects.all()
@@ -264,13 +275,14 @@ def search_posts(request):
         posts = Post.objects.all().order_by("-publish_date")
     return render(request, "search_results.html", {"posts": posts})
 
+
 @login_required
 def like_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     user = request.user
-    if request.method == 'POST':
+    if request.method == "POST":
         if user in post.likes.all():
             post.likes.remove(user)
         else:
             post.likes.add(user)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))

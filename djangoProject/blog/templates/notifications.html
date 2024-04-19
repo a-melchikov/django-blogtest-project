@@ -5,11 +5,11 @@
 
 {% block content %}
     <div class="container">
-        <h1>Уведомления</h1>
+        <h1 style="font-family: Arial, sans-serif;">Уведомления</h1>
         <form method="post">
             {% csrf_token %}
-            <table class="table">
-                <thead>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
                     <tr>
                         <th scope="col">Просмотрено</th>
                         <th scope="col">Тип</th>
@@ -24,13 +24,16 @@
                         <tr>
                             <td>
                                 {% if not notification.viewed %}
-                                    <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
+                                        <span class="checkmark"></span>
+                                    </label>
                                 {% endif %}
                             </td>
                             <td><strong>{{ notification.type }}</strong></td>
                             <td>{{ notification.text }}</td>
-                            <td><span style="color: blue;">{{ notification.sender_name }}</span></td>
-                            <td><span style="color: green;">{{ notification.timestamp }}</span></td>
+                            <td><a href="/profile/{{ notification.sender_name }}/">{{ notification.sender_name }}</a></td>
+                            <td>{{ notification.timestamp }}</td>
                             <td>
                                 <button type="button" class="btn btn-danger" onclick="deleteNotification({{ notification.id }})">Удалить</button>
                             </td>
@@ -41,6 +44,82 @@
             <button type="submit" class="btn btn-primary">Отметить как просмотренные</button>
         </form>
     </div>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+        }
+
+        .checkbox-container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #2196F3;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-container .checkmark:after {
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+    </style>
 
     <script>
         function deleteNotification(notificationId) {

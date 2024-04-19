@@ -33,8 +33,20 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
 
 
-admin.site.register(Notification)
-admin.site.register(Like)
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("user", "message", "timestamp", "is_new", "viewed")
+    list_filter = ("timestamp", "is_new", "viewed", "user")
+    search_fields = ("message",)
+    ordering = ("-timestamp",)
+
+
+@admin.register(Like)
+class LikeAdmin(admin.ModelAdmin):
+    list_display = ("user", "post", "like")
+    list_filter = ("like",)
+    search_fields = ("user__username", "post__title")
+
 
 admin.site.site_header = "Управление блогом"
 admin.site.site_title = "Администрирование"

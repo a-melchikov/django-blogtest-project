@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 from django.views.generic import (
@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Category, Like, Message, Notification, Post, Comment
+from .models import Category, Message, Notification, Post, Comment
 from .forms import PostForm, ProfileForm, CommentForm
 
 
@@ -69,12 +69,13 @@ class BlogDetailView(DetailView):
                 post.categories.add(*categories)
             user = request.user
             comments = Comment.objects.filter(post__author=user)
+            comments = Comment.objects.filter(post=post)
             for com in comments:
                 if not Notification.objects.filter(
-                    Q(user=user) & Q(message=f"Новый комментарий: {com.text}")
+                    Q(user=com.post.author) & Q(message=f"Новый комментарий: {com.text}")
                 ).exists():
                     Notification.objects.create(
-                        user=user, message=f"Новый комментарий: {com.text}", is_new=True
+                        user=com.post.author, message=f"Новый комментарий: {com.text}", is_new=True
                     )
             return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))
         else:
@@ -184,13 +185,13 @@ def send_message(request):
         )
         message.save()
         user = request.user
-        messages = Message.objects.filter(recipient=user)
+        messages = Message.objects.filter(sender=request.user)
         for mes in messages:
             if not Notification.objects.filter(
-                Q(user=user) & Q(message=f"Новое сообщение: {mes.subject}")
+                Q(user=mes.recipient) & Q(message=f"Новое сообщение: {mes.subject}")
             ).exists():
                 Notification.objects.create(
-                    user=user, message=f"Новое сообщение: {mes.subject}", is_new=True
+                    user=mes.recipient, message=f"Новое сообщение: {mes.subject}", is_new=True
                 )
         return redirect("inbox")
     else:

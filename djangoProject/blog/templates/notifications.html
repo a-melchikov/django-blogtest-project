@@ -31,7 +31,7 @@
                                 {% endif %}
                             </td>
                             <td><strong>{{ notification.type }}</strong></td>
-                            <td>{{ notification.text }}</td>
+                            <td>{{ notification.text|safe }}</td>
                             <td><a href="/profile/{{ notification.sender_name }}/">{{ notification.sender_name }}</a></td>
                             <td>{{ notification.timestamp }}</td>
                             <td>

@@ -103,6 +103,19 @@ def create_post(request):
             post.author = request.user
             post.save()
             form.save_m2m()
+
+            subscribed_users = Subscription.objects.filter(author=request.user)
+            post_detail_url = reverse('post_detail', args=[post.id])
+
+            for subscription in subscribed_users:
+                Notification.objects.create(
+                    user=subscription.subscriber,
+                    sender=request.user,
+                    sender_name=request.user.username,
+                    message=f"Новый пост: <a href='{post_detail_url}'>{post.title}</a>",
+                    is_new=True,
+                )
+
             return redirect("home")
     else:
         form = PostForm()

@@ -105,7 +105,7 @@ def create_post(request):
             form.save_m2m()
 
             subscribed_users = Subscription.objects.filter(author=request.user)
-            post_detail_url = reverse('post_detail', args=[post.id])
+            post_detail_url = reverse("post_detail", args=[post.id])
 
             for subscription in subscribed_users:
                 Notification.objects.create(
@@ -231,10 +231,16 @@ def user_profile_view(request, user_name):
     is_subscribed = False
     if request.user.is_authenticated:
         is_subscribed = request.user.subscriptions.filter(author=user).exists()
+    subscriber_count = user.subscribers.count()
     return render(
         request,
         "profile.html",
-        {"user": user, "user_posts": user_posts, "is_subscribed": is_subscribed},
+        {
+            "user": user,
+            "user_posts": user_posts,
+            "is_subscribed": is_subscribed,
+            "subscriber_count": subscriber_count,
+        },
     )
 
 

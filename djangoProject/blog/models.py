@@ -109,7 +109,9 @@ class Notification(models.Model):
         related_name="sent_notifications",
         default=None,
     )
-    sender_name = models.CharField(max_length=255, default="", verbose_name="Имя отправителя")  # Add a default value
+    sender_name = models.CharField(
+        max_length=255, default="", verbose_name="Имя отправителя"
+    )  # Add a default value
     message = models.TextField(verbose_name="Сообщение")
     text = models.CharField(max_length=255, null=True)
     type = models.CharField(max_length=255, null=True)
@@ -125,7 +127,6 @@ class Notification(models.Model):
         return self.message
 
 
-
 class Like(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="Пользователь"
@@ -139,3 +140,23 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.post.title} - {'Лайк' if self.like else 'Дизлайк'}"
+
+
+class Subscription(models.Model):
+    subscriber = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="subscriptions",
+        verbose_name="Подписчик",
+    )
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="subscribers", verbose_name="Автор"
+    )
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+        unique_together = ("subscriber", "author")
+
+    def __str__(self):
+        return f"{self.subscriber} подписан на {self.author}"

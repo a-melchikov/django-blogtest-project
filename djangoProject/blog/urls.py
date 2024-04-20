@@ -16,6 +16,8 @@ from .views import (
     search_posts,
     send_message,
     inbox,
+    subscribe,
+    unsubscribe,
     user_profile_view,
     notifications,
 )
@@ -45,4 +47,6 @@ urlpatterns = [
         delete_notification,
         name="delete_notification",
     ),
+    path('subscribe/<int:author_id>/', subscribe, name='subscribe'),
+    path('unsubscribe/<int:author_id>/', unsubscribe, name='unsubscribe'),
 ]

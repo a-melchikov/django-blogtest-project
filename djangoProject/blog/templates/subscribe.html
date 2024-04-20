@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Подписаться
+{% endblock %}
+
+{% block content %}
+    <h1>Подписаться</h1>
+    <p>Вы уверены, что хотите подписаться на пользователя {{ author.username }}?</p>
+    <form action="{% url 'subscribe' author.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Подписаться</button>
+    </form>
+    <a href="{% url 'user_profile' author.username %}">Отмена</a>
+{% endblock %}

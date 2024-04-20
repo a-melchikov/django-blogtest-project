@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
-from .models import Category, Message, Notification, Post, Comment
+from .models import Category, Message, Notification, Post, Comment, Subscription
 from .forms import PostForm, ProfileForm, CommentForm
 
 
@@ -213,11 +213,16 @@ def send_message(request):
 
 @login_required
 def user_profile_view(request, user_name):
-    # Получаем пользователя по его имени или возвращаем 404 ошибку, если пользователь не найден
     user = get_object_or_404(User, username=user_name)
     user_posts = Post.objects.filter(author=user).order_by("-publish_date")
-    # Здесь можно передать данные о пользователе и его постах в шаблон для отображения
-    return render(request, "profile.html", {"user": user, "user_posts": user_posts})
+    is_subscribed = False
+    if request.user.is_authenticated:
+        is_subscribed = request.user.subscriptions.filter(author=user).exists()
+    return render(
+        request,
+        "profile.html",
+        {"user": user, "user_posts": user_posts, "is_subscribed": is_subscribed},
+    )
 
 
 class AllProfilesView(ListView):
@@ -294,7 +299,38 @@ def delete_notification(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id)
     if request.user == notification.user:
         notification.delete()
-        messages.success(request, 'Уведомление успешно удалено.')
-        return redirect('notifications')
+        messages.success(request, "Уведомление успешно удалено.")
+        return redirect("notifications")
     else:
         return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")
+
+
+@login_required
+def subscribe(request, author_id):
+    author = get_object_or_404(User, id=author_id)
+    if request.user != author:
+        if request.method == "POST":
+            Subscription.objects.get_or_create(subscriber=request.user, author=author)
+            Notification.objects.create(
+                user=author,
+                sender=request.user,
+                sender_name=request.user.username,
+                message=f"Пользователь {request.user.username} подписался на ваши обновления: -",
+                is_new=True,
+            )
+            messages.success(request, "Вы успешно подписались на пользователя.")
+            return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
+        else:
+            return render(request, "subscribe.html", {"author": author})
+    else:
+        return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
+
+
+@login_required
+def unsubscribe(request, author_id):
+    author = get_object_or_404(User, id=author_id)
+    if request.method == "POST":
+        Subscription.objects.filter(subscriber=request.user, author=author).delete()
+        return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
+    else:
+        return render(request, "unsubscribe.html", {"author": author})

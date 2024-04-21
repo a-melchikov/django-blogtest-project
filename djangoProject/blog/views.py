@@ -1,4 +1,3 @@
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
@@ -318,7 +317,6 @@ def delete_notification(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id)
     if request.user == notification.user:
         notification.delete()
-        messages.success(request, "Уведомление успешно удалено.")
         return redirect("notifications")
     else:
         return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")
@@ -337,7 +335,6 @@ def subscribe(request, author_id):
                 message=f"Пользователь {request.user.username} подписался на ваши обновления: -",
                 is_new=True,
             )
-            messages.success(request, "Вы успешно подписались на пользователя.")
             return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
         else:
             return render(request, "subscribe.html", {"author": author})
@@ -353,3 +350,10 @@ def unsubscribe(request, author_id):
         return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
     else:
         return render(request, "unsubscribe.html", {"author": author})
+
+
+@login_required
+def delete_all_notifications(request):
+    if request.method == "POST":
+        Notification.objects.filter(user=request.user).delete()
+        return redirect("notifications")

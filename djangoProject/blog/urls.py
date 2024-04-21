@@ -8,6 +8,7 @@ from .views import (
     PostDeleteView,
     category_posts,
     create_post,
+    delete_all_notifications,
     delete_notification,
     edit_post,
     edit_profile,
@@ -49,4 +50,5 @@ urlpatterns = [
     ),
     path('subscribe/<int:author_id>/', subscribe, name='subscribe'),
     path('unsubscribe/<int:author_id>/', unsubscribe, name='unsubscribe'),
+    path('delete_all_notifications/', delete_all_notifications, name='delete_all_notifications'),
 ]

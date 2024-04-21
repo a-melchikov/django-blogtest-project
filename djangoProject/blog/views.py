@@ -1,6 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
+from django.http import (
+    Http404,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.urls import reverse, reverse_lazy
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 from django.views.generic import (
@@ -261,11 +265,6 @@ def notifications(request):
     for notification in notif:
         notification.type, notification.text = str(notification).split(":")
 
-    if request.method == "POST":
-        notification_ids = request.POST.getlist("notification_ids")
-        Notification.objects.filter(id__in=notification_ids).update(viewed=True)
-        return redirect("notifications")
-
     return render(
         request,
         "notifications.html",
@@ -357,3 +356,23 @@ def delete_all_notifications(request):
     if request.method == "POST":
         Notification.objects.filter(user=request.user).delete()
         return redirect("notifications")
+
+
+@login_required
+def mark_as_viewed(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id)
+    if request.user == notification.user:
+        notification.viewed = True
+        notification.save()
+        return redirect("notifications")
+    else:
+        return HttpResponseForbidden(
+            "Вы не имеете прав на отметку этого уведомления как просмотренного."
+        )
+
+
+@login_required
+def mark_all_as_viewed(request):
+    notifications = Notification.objects.filter(user=request.user, viewed=False)
+    notifications.update(viewed=True)
+    return redirect("notifications")

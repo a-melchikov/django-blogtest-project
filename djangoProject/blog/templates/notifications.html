@@ -12,7 +12,6 @@
                 <table class="table table-bordered table-striped">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">Просмотрено</th>
                             <th scope="col">Тип</th>
                             <th scope="col">Текст</th>
                             <th scope="col">Пользователь</th>
@@ -23,26 +22,22 @@
                     <tbody>
                         {% for notification in notifications %}
                             <tr>
-                                <td>
-                                    {% if not notification.viewed %}
-                                        <label class="checkbox-container">
-                                            <input type="checkbox" name="notification_ids" value="{{ notification.id }}">
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    {% endif %}
-                                </td>
                                 <td><strong>{{ notification.type }}</strong></td>
                                 <td>{{ notification.text|safe }}</td>
                                 <td><a href="/profile/{{ notification.sender_name }}/">{{ notification.sender_name }}</a></td>
                                 <td>{{ notification.timestamp }}</td>
                                 <td>
+                                    {% if not notification.viewed %}
+                                        <button type="button" class="btn btn-primary" onclick="markAsViewed({{ notification.id }})">Просмотреть</button>
+                                    {% else %}
+                                        <span class="text-success">Просмотрено</span>
+                                    {% endif %}
                                     <button type="button" class="btn btn-danger" onclick="deleteNotification({{ notification.id }})">Удалить</button>
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <button type="submit" class="btn btn-primary">Отметить как просмотренные</button>
             {% else %}
                 <p>Нет уведомлений.</p>
             {% endif %}
@@ -52,7 +47,12 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Удалить все уведомления</button>
             </form>
+            <form method="post" action="{% url 'mark_all_as_viewed' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Просмотреть все уведомления</button>
+            </form>
         {% endif %}
+
     </div>
 
     <style>
@@ -149,6 +149,24 @@
                 })
                 .catch(error => console.error('Error:', error));
             }
+        }
+
+        function markAsViewed(notificationId) {
+            fetch(`/mark_as_viewed/${notificationId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Failed to mark notification as viewed');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
     </script>
 {% endblock %}

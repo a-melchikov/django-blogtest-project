@@ -1,6 +1,5 @@
 from autoslug import AutoSlugField
 from django.db import models
-from django.template import Node
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -68,7 +67,7 @@ class Comment(models.Model):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name="comments",  # Это позволит получить доступ ко всем комментариям определенного поста
+        related_name="comments",
         verbose_name="Пост",
     )
     author = models.ForeignKey(
@@ -82,7 +81,6 @@ class Comment(models.Model):
     )
     approved_comment = models.BooleanField(default=True, verbose_name="Одобрен")
 
-    # Логика для обработки комментариев (то есть обрабатывать комментарии)
     def approve(self):
         self.approved_comment = True
         self.save()
@@ -111,7 +109,7 @@ class Notification(models.Model):
     )
     sender_name = models.CharField(
         max_length=255, default="", verbose_name="Имя отправителя"
-    )  # Add a default value
+    )
     message = models.TextField(verbose_name="Сообщение")
     text = models.CharField(max_length=255, null=True)
     type = models.CharField(max_length=255, null=True)

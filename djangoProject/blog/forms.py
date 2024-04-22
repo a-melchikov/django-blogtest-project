@@ -1,6 +1,4 @@
 from django import forms
-
-from authentication.models import Profile
 from .models import Comment, Post, Category
 
 
@@ -14,12 +12,6 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ["title", "body", "categories"]
-
-
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ["date_of_birth", "country", "city", "bio"]
 
 
 class CommentForm(forms.ModelForm):

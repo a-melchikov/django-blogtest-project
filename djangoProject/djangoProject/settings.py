@@ -149,6 +149,6 @@ STATIC_URL = "/static/"
 
 # Укажите путь к вашей директории для медиафайлов (например, аватаров пользователей)
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 LOGIN_REDIRECT_URL = "/"

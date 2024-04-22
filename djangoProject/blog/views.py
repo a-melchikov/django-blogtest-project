@@ -19,8 +19,9 @@ from django.contrib.auth.models import User
 
 from authentication.models import Profile
 
+from authentication.forms import ProfileForm
 from .models import Category, Message, Notification, Post, Comment, Subscription
-from .forms import PostForm, ProfileForm, CommentForm
+from .forms import PostForm, CommentForm
 
 
 class BlogList(ListView):

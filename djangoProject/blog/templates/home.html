@@ -26,6 +26,7 @@
 <form class="form-inline" method="GET" action="{% url 'search_posts' %}">
     <input type="text" class="form-control" name="query" placeholder="Поиск...">
     <button type="submit" class="btn btn-primary">Найти</button>
+    <a href="{% url 'subscribed_posts' %}" class="btn btn-primary">Просмотреть посты пользователей, на которых вы подписаны</a>
 </form>
 
 {% for post in posts %}

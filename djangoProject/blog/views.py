@@ -181,12 +181,8 @@ def edit_post(request, pk):
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
-    success_url = reverse_lazy(
-        "my_posts"
-    )
-    template_name = (
-        "post/post_confirm_delete.html"
-    )
+    success_url = reverse_lazy("my_posts")
+    template_name = "post/post_confirm_delete.html"
 
 
 @login_required
@@ -376,3 +372,17 @@ def mark_all_as_viewed(request):
     notifications = Notification.objects.filter(user=request.user, viewed=False)
     notifications.update(viewed=True)
     return redirect("notifications")
+
+
+@login_required
+def subscribed_posts(request):
+    subscriptions = Subscription.objects.filter(subscriber=request.user)
+    subscribed_authors = [subscription.author for subscription in subscriptions]
+
+    posts = []
+
+    for author in subscribed_authors:
+        author_posts = Post.objects.filter(author=author)
+        posts.extend(author_posts)
+
+    return render(request, "post/subscribed_posts.html", {"posts": posts})

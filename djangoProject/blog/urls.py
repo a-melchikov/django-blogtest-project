@@ -20,6 +20,7 @@ from .views import (
     send_message,
     inbox,
     subscribe,
+    subscribed_posts,
     unsubscribe,
     user_profile_view,
     notifications,
@@ -59,4 +60,5 @@ urlpatterns = [
     ),
     path("mark_as_viewed/<int:notification_id>/", mark_as_viewed, name="mark_as_viewed"),
     path("mark_all_as_viewed/", mark_all_as_viewed, name="mark_all_as_viewed"),
+    path("subscribed_posts/", subscribed_posts, name="subscribed_posts"),
 ]

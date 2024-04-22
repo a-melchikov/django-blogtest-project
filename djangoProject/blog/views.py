@@ -49,7 +49,7 @@ class BlogList(ListView):
 
 class BlogDetailView(DetailView):
     model = Post
-    template_name = "post_detail.html"
+    template_name = "post/post_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -122,15 +122,14 @@ def create_post(request):
             return redirect("home")
     else:
         form = PostForm()
-    return render(request, "create_post.html", {"form": form})
+    return render(request, "post/create_post.html", {"form": form})
 
 
 @login_required
 def my_posts(request):
-    # Получаем все посты текущего пользователя
     user = request.user
     user_posts = Post.objects.filter(author=user).order_by("-publish_date")
-    return render(request, "my_posts.html", {"user_posts": user_posts})
+    return render(request, "post/my_posts.html", {"user_posts": user_posts})
 
 
 @login_required
@@ -147,7 +146,7 @@ def edit_profile(request, user_name):
             return redirect("user_profile", user_name=request.user.username)
     else:
         form = ProfileForm(instance=request.user.profile)
-    return render(request, "edit_profile.html", {"form": form})
+    return render(request, "profile/edit_profile.html", {"form": form})
 
 
 @login_required
@@ -170,7 +169,7 @@ def edit_post(request, pk):
     categories = Category.objects.all()
     return render(
         request,
-        "edit_post.html",
+        "post/edit_post.html",
         {
             "form": form,
             "categories": categories,
@@ -183,16 +182,16 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     success_url = reverse_lazy(
         "my_posts"
-    )  # После успешного удаления перенаправить на страницу с моими постами
+    )
     template_name = (
-        "post_confirm_delete.html"  # Создайте шаблон подтверждения удаления поста
+        "post/post_confirm_delete.html"
     )
 
 
 @login_required
 def inbox(request):
     messages = Message.objects.filter(recipient=request.user).order_by("-timestamp")
-    return render(request, "inbox.html", {"messages": messages})
+    return render(request, "messages/inbox.html", {"messages": messages})
 
 
 @login_required
@@ -224,7 +223,7 @@ def send_message(request):
         return redirect("inbox")
     else:
         profiles = Profile.objects.all()
-        return render(request, "send_message.html", {"profiles": profiles})
+        return render(request, "messages/send_message.html", {"profiles": profiles})
 
 
 @login_required
@@ -237,7 +236,7 @@ def user_profile_view(request, user_name):
     subscriber_count = user.subscribers.count()
     return render(
         request,
-        "profile.html",
+        "profile/profile.html",
         {
             "user": user,
             "user_posts": user_posts,
@@ -249,7 +248,7 @@ def user_profile_view(request, user_name):
 
 class AllProfilesView(ListView):
     model = Profile
-    template_name = "all_profiles.html"
+    template_name = "profile/all_profiles.html"
     context_object_name = "profile_list"
 
     def get_queryset(self):
@@ -267,7 +266,7 @@ def notifications(request):
 
     return render(
         request,
-        "notifications.html",
+        "notification/notifications.html",
         {"notifications": notif, "notifications_count": not_viewed_count},
     )
 
@@ -279,7 +278,7 @@ def category_posts(request, category_slug):
         "category": category,
         "posts": posts,
     }
-    return render(request, "category_posts.html", context)
+    return render(request, "post/category_posts.html", context)
 
 
 def search_posts(request):
@@ -336,7 +335,7 @@ def subscribe(request, author_id):
             )
             return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
         else:
-            return render(request, "subscribe.html", {"author": author})
+            return render(request, "profile/subscribe.html", {"author": author})
     else:
         return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
 
@@ -348,7 +347,7 @@ def unsubscribe(request, author_id):
         Subscription.objects.filter(subscriber=request.user, author=author).delete()
         return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
     else:
-        return render(request, "unsubscribe.html", {"author": author})
+        return render(request, "profile/unsubscribe.html", {"author": author})
 
 
 @login_required

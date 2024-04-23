@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Список подписчиков
+{% endblock %}
+
+{% block content %}
+<style>
+    .container {
+        background-color: #ffffff;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .user-info {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .user-info h2 {
+        margin-top: 0;
+    }
+    .user-info h2 a {
+        text-decoration: none;
+        color: #0366d6;
+        transition: color 0.3s ease; 
+    }
+    .user-info h2 a:hover {
+        color: #05529b;
+    }
+</style>
+<div class="container">
+    <h1>Список подписчиков пользователя {{ user.username }}</h1>
+    <ul>
+        {% for subscription in subscribers %}
+            <li class="user-info">
+                <h2><a href="{% url 'user_profile' subscription.subscriber.username %}">{{ subscription.subscriber.username }}</a></h2>
+            </li>
+        {% empty %}
+            <li>Подписчиков пока нет</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

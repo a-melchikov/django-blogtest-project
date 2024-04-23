@@ -67,8 +67,9 @@
     <div class="profile-info">
         <h1>Профиль</h1>
         <div class="subscriber-count">
-            <h2 class="subscriber-title">Подписчиков:</h2>
+            <h2 class="subscriber-title">Подписчики:</h2>
             <span class="subscriber-number">{{ subscriber_count }}</span>
+            <a href="{% url 'subscriber_list' user.username %}" class="btn btn-primary">Показать всех подписчиков</a>
         </div>
         <p>Имя пользователя: {{ user.username }}</p>
         <p>Дата рождения: {% if user.profile.date_of_birth %}{{ user.profile.date_of_birth }}{% else %}Не указана{% endif %}</p>

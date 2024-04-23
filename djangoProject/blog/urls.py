@@ -21,6 +21,7 @@ from .views import (
     inbox,
     subscribe,
     subscribed_posts,
+    subscriber_list,
     unsubscribe,
     user_profile_view,
     notifications,
@@ -58,7 +59,10 @@ urlpatterns = [
         delete_all_notifications,
         name="delete_all_notifications",
     ),
-    path("mark_as_viewed/<int:notification_id>/", mark_as_viewed, name="mark_as_viewed"),
+    path(
+        "mark_as_viewed/<int:notification_id>/", mark_as_viewed, name="mark_as_viewed"
+    ),
     path("mark_all_as_viewed/", mark_all_as_viewed, name="mark_all_as_viewed"),
     path("subscribed_posts/", subscribed_posts, name="subscribed_posts"),
+    path('subscribers/<str:username>/', subscriber_list, name='subscriber_list'),
 ]

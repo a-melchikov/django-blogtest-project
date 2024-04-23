@@ -386,3 +386,16 @@ def subscribed_posts(request):
         posts.extend(author_posts)
 
     return render(request, "post/subscribed_posts.html", {"posts": posts})
+
+
+@login_required
+def subscriber_list(request, username):
+    user = get_object_or_404(User, username=username)
+
+    subscriptions = Subscription.objects.filter(author=user)
+
+    return render(
+        request,
+        "profile/subscriber_list.html",
+        {"user": user, "subscribers": subscriptions},
+    )

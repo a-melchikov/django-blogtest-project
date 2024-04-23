@@ -40,7 +40,14 @@
                         </div>
                     {% endfor %}
                 </div>
-            </div>            
+            </div>
+            <div class="mb-3">
+                <p>Выберите параметры доступа к посту:</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="for_subscribers" name="for_subscribers" value="true">
+                    <label class="form-check-label" for="for_subscribers">Ограничить доступ к посту (только для подписчиков)</label>
+                </div>
+            </div>     
             <button type="submit" class="btn btn-primary">Отправить</button>
         </form>
     </div>

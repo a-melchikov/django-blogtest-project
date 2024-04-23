@@ -28,6 +28,9 @@ class Post(models.Model):
     )
     categories = models.ManyToManyField(Category, verbose_name="Категории")
     likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
+    for_subscribers = models.BooleanField(
+        default=False, verbose_name="Только для подписчиков"
+    )
 
     class Meta:
         verbose_name = "Пост"

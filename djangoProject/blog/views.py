@@ -32,7 +32,12 @@ class BlogList(ListView):
     ordering = "-publish_date"
 
     def get_queryset(self):
-        return Post.objects.all().order_by(self.ordering)
+        subscribed_authors = self.request.user.subscriptions.values_list(
+            "author", flat=True
+        )
+        return Post.objects.filter(
+            Q(for_subscribers=False) | Q(author__in=subscribed_authors)
+        ).order_by(self.ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,6 +50,18 @@ class BlogList(ListView):
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
         context["posts"] = page_obj
+
+        authors = {post.author_id: post.author for post in page_obj.object_list}
+        author_subscribers = {
+            author_id: list(
+                User.objects.filter(
+                    subscribers__subscriber=self.request.user, id=author_id
+                )
+            )
+            for author_id in authors.keys()
+        }
+        context["author_subscribers"] = author_subscribers
+
         return context
 
 
@@ -105,15 +122,16 @@ def create_post(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
+
+            post.for_subscribers = request.POST.get("for_subscribers", False) == "on"
             post.save()
             form.save_m2m()
 
-            subscribed_users = Subscription.objects.filter(author=request.user)
             post_detail_url = reverse("post_detail", args=[post.id])
-
-            for subscription in subscribed_users:
+            subscribers = Subscription.objects.filter(author=request.user)
+            for subscriber in subscribers:
                 Notification.objects.create(
-                    user=subscription.subscriber,
+                    user=subscriber.subscriber,
                     sender=request.user,
                     sender_name=request.user.username,
                     message=f"Новый пост: <a href='{post_detail_url}'>{post.title}</a>",
@@ -123,7 +141,10 @@ def create_post(request):
             return redirect("home")
     else:
         form = PostForm()
-    return render(request, "post/create_post.html", {"form": form})
+    categories = Category.objects.all()
+    return render(
+        request, "post/create_post.html", {"form": form, "categories": categories}
+    )
 
 
 @login_required

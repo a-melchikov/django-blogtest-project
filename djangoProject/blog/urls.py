@@ -22,6 +22,7 @@ from .views import (
     subscribe,
     subscribed_posts,
     subscriber_list,
+    toggle_favorite,
     unsubscribe,
     user_profile_view,
     notifications,
@@ -64,5 +65,6 @@ urlpatterns = [
     ),
     path("mark_all_as_viewed/", mark_all_as_viewed, name="mark_all_as_viewed"),
     path("subscribed_posts/", subscribed_posts, name="subscribed_posts"),
-    path('subscribers/<str:username>/', subscriber_list, name='subscriber_list'),
+    path("subscribers/<str:username>/", subscriber_list, name="subscriber_list"),
+    path('toggle_favorite/<int:post_id>/', toggle_favorite, name='toggle_favorite'),
 ]

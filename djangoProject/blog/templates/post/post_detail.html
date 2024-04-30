@@ -25,6 +25,16 @@
                                         </button>
                                     {% endif %}
                                 </form>
+                                <form method="post" action="{% url 'toggle_favorite' post.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link">
+                                        {% if post.favorite_set.filter(user=user).exists %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    </button>
+                                </form>
                             {% endif %}             
                         </div>
                     </div>

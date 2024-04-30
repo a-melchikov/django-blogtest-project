@@ -20,7 +20,7 @@ from django.contrib.auth.models import User
 from authentication.models import Profile
 
 from authentication.forms import ProfileForm
-from .models import Category, Message, Notification, Post, Comment, Subscription
+from .models import Category, Favorite, Message, Notification, Post, Comment, Subscription
 from .forms import PostForm, CommentForm
 
 
@@ -420,3 +420,13 @@ def subscriber_list(request, username):
         "profile/subscriber_list.html",
         {"user": user, "subscribers": subscriptions},
     )
+
+
+@login_required
+def toggle_favorite(request, post_id):
+    post = Post.objects.get(pk=post_id)
+    user = request.user
+    favorite, created = Favorite.objects.get_or_create(user=user, post=post)
+    if not created:
+        favorite.delete()
+    return redirect("post_detail", post_id=post_id)

@@ -12,6 +12,7 @@ from .views import (
     delete_notification,
     edit_post,
     edit_profile,
+    favorite_posts,
     like_post,
     mark_all_as_viewed,
     mark_as_viewed,
@@ -67,4 +68,5 @@ urlpatterns = [
     path("subscribed_posts/", subscribed_posts, name="subscribed_posts"),
     path("subscribers/<str:username>/", subscriber_list, name="subscriber_list"),
     path('toggle_favorite/<int:post_id>/', toggle_favorite, name='toggle_favorite'),
+    path('favorite-posts/', favorite_posts, name='favorite_posts'),
 ]

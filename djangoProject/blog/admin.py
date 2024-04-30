@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Like, Notification, Post, Message, Comment, Subscription
+from .models import Category, Favorite, Like, Notification, Post, Message, Comment, Subscription
 
 
 @admin.register(Post)
@@ -50,6 +50,12 @@ class LikeAdmin(admin.ModelAdmin):
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ("subscriber", "author")
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ("user", "post")
+    search_fields = ("user__username", "post__title")
 
 
 admin.site.site_header = "Управление блогом"

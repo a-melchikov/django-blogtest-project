@@ -20,7 +20,15 @@ from django.contrib.auth.models import User
 from authentication.models import Profile
 
 from authentication.forms import ProfileForm
-from .models import Category, Favorite, Message, Notification, Post, Comment, Subscription
+from .models import (
+    Category,
+    Favorite,
+    Message,
+    Notification,
+    Post,
+    Comment,
+    Subscription,
+)
 from .forms import PostForm, CommentForm
 
 
@@ -76,6 +84,11 @@ class BlogDetailView(DetailView):
             "-created_date"
         )
         context["comment_form"] = CommentForm()
+
+        user = self.request.user
+        if user.is_authenticated:
+            context["is_favorite"] = post.favorite_set.filter(user=user).exists()
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -429,4 +442,10 @@ def toggle_favorite(request, post_id):
     favorite, created = Favorite.objects.get_or_create(user=user, post=post)
     if not created:
         favorite.delete()
-    return redirect("post_detail", post_id=post_id)
+    return redirect("post_detail", pk=post_id)
+
+
+@login_required
+def favorite_posts(request):
+    favorite_posts = Favorite.objects.filter(user=request.user).select_related("post")
+    return render(request, "post/favorite_posts.html", {"favorite_posts": favorite_posts})

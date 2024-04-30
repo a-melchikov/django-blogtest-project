@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Избранное
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Избранные посты</h1>
+    <div class="col-md-12">
+        {% if favorite_posts %}
+            {% for favorite in favorite_posts %}
+                <div class="bg-image card mb-4 shadow-1-strong"
+                    style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
+                    <div class="card-body text-white">
+                        <h2>{{ favorite.post.title }}</h2>
+                        <p>Автор: <b>{{ favorite.post.author }}</b></p>
+                        <p>Дата публикации: {{ favorite.post.publish_date }}</p>
+                        <p>{{ favorite.post.body }}</p>
+                        <a href="{% url 'post_detail' favorite.post.pk %}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>У вас пока нет избранных постов.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

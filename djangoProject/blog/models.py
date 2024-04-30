@@ -164,8 +164,15 @@ class Subscription(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name="Пост")
 
     class Meta:
+        verbose_name = "Избранное"
+        verbose_name_plural = "Избранные посты"
         unique_together = ("user", "post")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.post.title}"

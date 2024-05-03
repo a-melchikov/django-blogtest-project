@@ -1,11 +1,7 @@
 {% extends 'base.html' %}
-
-{% block title %}
-Мой Блог - Главная
-{% endblock %}
-
+{% block title %}Мой Блог - Главная{% endblock %}
 {% block content %}
-<style>
+    <style>
     .pagination {
         display: flex;
         justify-content: center;
@@ -19,39 +15,49 @@
     .user-info h2 a:hover {
         color: #05529b;
     }
-</style>
 
-<h1>Все посты</h1>
-
-<form class="form-inline" method="GET" action="{% url 'search_posts' %}">
-    <input type="text" class="form-control" name="query" placeholder="Поиск...">
-    <button type="submit" class="btn btn-primary">Найти</button>
-    <a href="{% url 'subscribed_posts' %}" class="btn btn-primary">Просмотреть посты пользователей, на которых вы подписаны</a>
-</form>
-
-{% for post in posts %}
-{% if not post.for_subscribers or post.author in request.user.subscriptions.all %}
-
+    button[type=submit] {
+        margin-top: 10px;
+    }
+    </style>
+    <h1>Все посты</h1>
+    <form class="form-inline" method="GET" action="{% url 'search_posts' %}">
+        <input type="text" class="form-control" name="query" placeholder="Поиск...">
+        <button type="submit" class="btn btn-primary">Найти</button>
+        <a href="{% url 'subscribed_posts' %}"
+           class="btn btn-primary"
+           style="margin-top: 10px">Просмотреть посты пользователей, на которых вы подписаны</a>
+    </form>
+    {% for post in posts %}
         <div style="margin-top: 1%">
             <div class="row align-items-start">
                 <div class="col">
-                    <div class="bg-image card shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
+                    <div class="bg-image card shadow-1-strong"
+                         style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%)">
                         <div class="card-body text-white">
                             <h2>{{ post.title }}</h2>
                             {% if post.categories.exists %}
-                                <p>Категории: 
+                                <p>
+                                    Категории:
                                     {% for category in post.categories.all %}
-                                        <b>{{ category.name }}</b>{% if not forloop.last %}, {% endif %}
+                                        <b>{{ category.name }}</b>
+                                        {% if not forloop.last %},{% endif %}
                                     {% endfor %}
                                 </p>
                             {% else %}
                                 <p>Категории не выбраны</p>
                             {% endif %}
-                            <p>Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b></p>
+                            <p>
+                                Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b>
+                            </p>
                             <p>Дата публикации: {{ post.publish_date }}</p>
                             <p>{{ post.body }}</p>
                             {% if post.for_subscribers %}
-                                <p>Этот пост доступен только для подписчиков</p>
+                                <p>
+                                    <span style="color: red;">
+                                        <i class="fas fa-lock"></i> Этот пост доступен только для подписчиков
+                                    </span>
+                                </p>
                             {% endif %}
                             <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                         </div>
@@ -59,29 +65,26 @@
                 </div>
             </div>
         </div>
-    {% endif %}
-{% empty %}
-    <p>Постов пока нет.</p>
-{% endfor %}
-
-
-<!-- Pagination links -->
-<div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1" class="btn btn-secondary">&laquo; первая</a>
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">предыдущая</a>
-        {% endif %}
-
-        <span class="current">
-            <b>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</b>
+    {% empty %}
+        <p>Постов пока нет.</p>
+    {% endfor %}
+    <!-- Pagination links -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="btn btn-secondary">&laquo; первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="btn btn-secondary">предыдущая</a>
+            {% endif %}
+            <span class="current">
+                <b>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</b>
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="btn btn-secondary">следующая</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}"
+                   class="btn btn-secondary">последняя &raquo;</a>
+            {% endif %}
         </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">следующая</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">последняя &raquo;</a>
-        {% endif %}
-    </span>
-</div>
-
+    </div>
 {% endblock %}

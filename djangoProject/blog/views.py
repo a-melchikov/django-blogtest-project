@@ -16,6 +16,8 @@ from django.views.generic import (
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import UserPassesTestMixin
+
 
 from authentication.models import Profile
 
@@ -44,7 +46,9 @@ class BlogList(ListView):
             "author", flat=True
         )
         return Post.objects.filter(
-            Q(for_subscribers=False) | Q(author__in=subscribed_authors)
+            Q(for_subscribers=False)
+            | Q(author__in=subscribed_authors)
+            | Q(author=self.request.user)
         ).order_by(self.ordering)
 
     def get_context_data(self, **kwargs):
@@ -73,7 +77,7 @@ class BlogList(ListView):
         return context
 
 
-class BlogDetailView(DetailView):
+class BlogDetailView(UserPassesTestMixin, DetailView):
     model = Post
     template_name = "post/post_detail.html"
 
@@ -122,6 +126,16 @@ class BlogDetailView(DetailView):
             return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))
         else:
             return self.render_to_response(self.get_context_data(form=form))
+
+    def test_func(self):
+        post = self.get_object()
+        user = self.request.user
+        return (post.author == user) or user.subscriptions.filter(
+            author=post.author
+        ).exists()
+
+    def handle_no_permission(self):
+        raise Http404("Вы не подписаны на автора этого поста")
 
 
 class AboutPageView(TemplateView):
@@ -448,4 +462,6 @@ def toggle_favorite(request, post_id):
 @login_required
 def favorite_posts(request):
     favorite_posts = Favorite.objects.filter(user=request.user).select_related("post")
-    return render(request, "post/favorite_posts.html", {"favorite_posts": favorite_posts})
+    return render(
+        request, "post/favorite_posts.html", {"favorite_posts": favorite_posts}
+    )

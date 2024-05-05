@@ -6,6 +6,7 @@ from .views import (
     BlogDetailView,
     BlogList,
     PostDeleteView,
+    SubscriptionConfirmationView,
     category_posts,
     create_post,
     delete_all_notifications,
@@ -67,6 +68,7 @@ urlpatterns = [
     path("mark_all_as_viewed/", mark_all_as_viewed, name="mark_all_as_viewed"),
     path("subscribed_posts/", subscribed_posts, name="subscribed_posts"),
     path("subscribers/<str:username>/", subscriber_list, name="subscriber_list"),
-    path('toggle_favorite/<int:post_id>/', toggle_favorite, name='toggle_favorite'),
-    path('favorite-posts/', favorite_posts, name='favorite_posts'),
+    path("toggle_favorite/<int:post_id>/", toggle_favorite, name="toggle_favorite"),
+    path("favorite-posts/", favorite_posts, name="favorite_posts"),
+    path('subscription-confirmation/<int:post_id>/', SubscriptionConfirmationView.as_view(), name='subscription_confirmation'),
 ]

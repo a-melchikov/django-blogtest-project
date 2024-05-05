@@ -136,12 +136,16 @@ class BlogDetailView(UserPassesTestMixin, DetailView):
     def test_func(self):
         post = self.get_object()
         user = self.request.user
-        return (post.author == user) or user.subscriptions.filter(
-            author=post.author
-        ).exists()
+        if not post.for_subscribers:
+            return True
+        return (post.author == user) or (
+            hasattr(user, "subscriptions")
+            and user.subscriptions.filter(author=post.author).exists()
+        )
 
     def handle_no_permission(self):
-        raise Http404("Вы не подписаны на автора этого поста")
+        post = self.get_object()
+        return redirect("subscription_confirmation", post_id=post.pk)
 
 
 class AboutPageView(TemplateView):
@@ -471,3 +475,15 @@ def favorite_posts(request):
     return render(
         request, "post/favorite_posts.html", {"favorite_posts": favorite_posts}
     )
+
+
+class SubscriptionConfirmationView(TemplateView):
+    template_name = "post/subscription_confirmation.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post_id = self.kwargs["post_id"]
+        post = get_object_or_404(Post, pk=post_id)
+        context["post"] = post
+        context["post_id"] = post_id
+        return context

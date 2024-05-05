@@ -15,18 +15,12 @@
     .user-info h2 a:hover {
         color: #05529b;
     }
-
-    button[type=submit] {
-        margin-top: 10px;
-    }
     </style>
     <h1>Все посты</h1>
     <form class="form-inline" method="GET" action="{% url 'search_posts' %}">
         <input type="text" class="form-control" name="query" placeholder="Поиск...">
         <button type="submit" class="btn btn-primary">Найти</button>
-        <a href="{% url 'subscribed_posts' %}"
-           class="btn btn-primary"
-           style="margin-top: 10px">Просмотреть посты пользователей, на которых вы подписаны</a>
+        <a href="{% url 'subscribed_posts' %}" class="btn btn-primary">Посмотреть подписки</a>
     </form>
     {% for post in posts %}
         <div style="margin-top: 1%">

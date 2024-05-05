@@ -42,14 +42,19 @@ class BlogList(ListView):
     ordering = "-publish_date"
 
     def get_queryset(self):
-        subscribed_authors = self.request.user.subscriptions.values_list(
-            "author", flat=True
-        )
-        return Post.objects.filter(
-            Q(for_subscribers=False)
-            | Q(author__in=subscribed_authors)
-            | Q(author=self.request.user)
-        ).order_by(self.ordering)
+        queryset = Post.objects.all()
+        if self.request.user.is_authenticated:
+            subscribed_authors = self.request.user.subscriptions.values_list(
+                "author__id", flat=True
+            )
+            queryset = queryset.filter(
+                Q(for_subscribers=False)
+                | Q(author__id__in=subscribed_authors)
+                | Q(author=self.request.user)
+            ).order_by(self.ordering)
+        else:
+            queryset = queryset.filter(for_subscribers=False).order_by(self.ordering)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -63,16 +68,17 @@ class BlogList(ListView):
             page_obj = paginator.page(paginator.num_pages)
         context["posts"] = page_obj
 
-        authors = {post.author_id: post.author for post in page_obj.object_list}
-        author_subscribers = {
-            author_id: list(
-                User.objects.filter(
-                    subscribers__subscriber=self.request.user, id=author_id
+        if self.request.user.is_authenticated:
+            authors = {post.author_id: post.author for post in page_obj.object_list}
+            author_subscribers = {
+                author_id: list(
+                    User.objects.filter(
+                        subscriptions__subscriber=self.request.user, id=author_id
+                    )
                 )
-            )
-            for author_id in authors.keys()
-        }
-        context["author_subscribers"] = author_subscribers
+                for author_id in authors.keys()
+            }
+            context["author_subscribers"] = author_subscribers
 
         return context
 

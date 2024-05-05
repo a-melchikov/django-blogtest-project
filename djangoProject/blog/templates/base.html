@@ -39,9 +39,7 @@
         .navbar-nav.extra-nav {
             margin-left: auto;
         }
-        .navbar-nav.extra-nav .nav-item.position-relative {
-            margin-left: 10px; /* Изменение отступа */
-        }
+        
         </style>
     </head>
     <body>
@@ -106,19 +104,20 @@
                 </ul>
             </div>
         </div>
-        <ul class="navbar-nav extra-nav">
+        <div class="d-flex justify-content-center align-items-center">
             {% block extra_nav_content %}
                 {% if request.user.is_authenticated %}
                     <li class="nav-item position-relative">
-                        <a href="{% url 'notifications' %}" class="nav-link">
-                            <i class="bi bi-bell text-light fs-4 position-absolute top-0"></i>
-                            {% if notifications_count > 0 %}
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ notifications_count }}</span>
-                            {% endif %}
+                        <a href="{% url 'notifications' %}"
+                           class="nav-link"
+                           style="display: flex;
+                                  align-items: center">
+                            <i class="bi bi-bell text-light fs-4" style="margin-right: 10px;"></i>
+                            {% if notifications_count > 0 %}<span class="badge rounded-pill bg-danger">{{ notifications_count }}</span>{% endif %}
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <span class="navbar-text text-light me-3 username">{{ request.user.username }}</span>
+                    <li class="nav-item me-3">
+                        <span class="navbar-text text-light username">{{ request.user.username }}</span>
                     </li>
                     <li class="nav-item">
                         <form method="post" action="{% url 'logout' %}">
@@ -127,10 +126,12 @@
                         </form>
                     </li>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-outline-light">Войти</a>
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="btn btn-outline-light">Войти</a>
+                    </li>
                 {% endif %}
             {% endblock %}
-        </ul>
+        </div>
     </nav>
     <div class="container">
         {% block content %}{% endblock %}

@@ -12,7 +12,7 @@
         font-weight: bold;
         position: absolute;
         top: 20px;
-        right: 60px;
+        right: 20px;
         margin-top: 20px;
     }
     
@@ -40,9 +40,6 @@
         position: relative;
     }
 
-    .avatar {
-        margin-right: 20px;
-    }
 
     .avatar img {
         width: 200px;
@@ -53,6 +50,27 @@
 
     .profile-info {
         flex-grow: 1;
+    }
+    .avatar {
+        margin-right: 20px;
+    }
+    
+    .subscriber-count {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+    
+    @media (max-width: 767px) {
+        .avatar {
+            margin-right: 0;
+        }
+    
+        .subscriber-count {
+            position: relative;
+            margin-top: 10px;
+            margin-left: 20px;
+        }
     }
 </style>
 

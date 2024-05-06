@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Мой Блог - Главная{% endblock %}
 {% block content %}
     <style>
@@ -6,14 +7,31 @@
         display: flex;
         justify-content: center;
     }
-
     .user-info h2 a {
         text-decoration: none;
         color: #0366d6;
-        transition: color 0.3s ease; 
+        transition: color 0.3s ease;
     }
     .user-info h2 a:hover {
         color: #05529b;
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+    }
+    .post-date {
+        font-size: 14px;
+        text-align: right;
+        margin-top: -10px;
+    }
+    .avatar img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid black;
+    }
+    .avatar img {
+        margin-right: 20px;
     }
     </style>
     <h1>Все посты</h1>
@@ -29,22 +47,39 @@
                     <div class="bg-image card shadow-1-strong"
                          style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%)">
                         <div class="card-body text-white">
-                            <h2>{{ post.title }}</h2>
+                            <div class="post-date">{{ post.publish_date }}</div>
+                            <div class="user-info">
+                                <div class="avatar">
+                                    {% if post.author.profile.avatar %}
+                                    <img src="{{ post.author.profile.avatar.url }}"
+                                    alt="Avatar"
+                                    class="img-fluid">
+                                    {% else %}
+                                    <img src="{% static 'images/transparent.jpg' %}"
+                                    alt="No Avatar"
+                                    class="img-fluid">
+                                    {% endif %}
+                                </div>
+                                <h4>
+                                    <a href="{% url 'user_profile' post.author.username %}"
+                                       style="text-decoration: none;
+                                              color: #4CAF50;
+                                              transition: color 0.3s ease"
+                                       onmouseover="this.style.color='#FF5722'"
+                                       onmouseout="this.style.color='#4CAF50'">{{ post.author }}</a>
+                                </h4>
+                            </div>
                             {% if post.categories.exists %}
                                 <p>
-                                    Категории:
                                     {% for category in post.categories.all %}
-                                        <b>{{ category.name }}</b>
+                                        <i>{{ category.name }}*</i>
                                         {% if not forloop.last %},{% endif %}
                                     {% endfor %}
                                 </p>
                             {% else %}
                                 <p>Категории не выбраны</p>
                             {% endif %}
-                            <p>
-                                Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b>
-                            </p>
-                            <p>Дата публикации: {{ post.publish_date }}</p>
+                            <h2>{{ post.title }}</h2>
                             <p>{{ post.body }}</p>
                             {% if post.for_subscribers %}
                                 <p>

@@ -1,0 +1,8 @@
+.form-inline {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.form-inline .form-control {
+    margin-bottom: 10px;
+}

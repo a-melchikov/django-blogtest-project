@@ -146,6 +146,9 @@ ASGI_APPLICATION = "myproject.asgi.application"
 
 # Укажите путь к вашей директории для статических файлов
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static/"),
+]
 
 # Укажите путь к вашей директории для медиафайлов (например, аватаров пользователей)
 MEDIA_URL = "/media/"

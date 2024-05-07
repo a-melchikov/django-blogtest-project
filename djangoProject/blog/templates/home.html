@@ -2,39 +2,14 @@
 {% load static %}
 {% block title %}Мой Блог - Главная{% endblock %}
 {% block content %}
-    <style>
-    .pagination {
-        display: flex;
-        justify-content: center;
-    }
-    .user-info h2 a {
-        text-decoration: none;
-        color: #0366d6;
-        transition: color 0.3s ease;
-    }
-    .user-info h2 a:hover {
-        color: #05529b;
-    }
-    .user-info {
-        display: flex;
-        align-items: center;
-    }
-    .post-date {
-        font-size: 14px;
-        text-align: right;
-        margin-top: -10px;
-    }
-    .avatar img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 1px solid black;
-    }
-    .avatar img {
-        margin-right: 20px;
-    }
-    </style>
-    <h1>Все посты</h1>
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/pagination-styles.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/post-card-styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+    <h1>Публикации</h1>
     <form class="form-inline" method="GET" action="{% url 'search_posts' %}">
         <input type="text" class="form-control" name="query" placeholder="Поиск...">
         <button type="submit" class="btn btn-primary">Найти</button>
@@ -44,30 +19,34 @@
         <div style="margin-top: 1%">
             <div class="row align-items-start">
                 <div class="col">
-                    <div class="bg-image card shadow-1-strong"
-                         style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%)">
-                        <div class="card-body text-white">
-                            <div class="post-date">{{ post.publish_date }}</div>
+                    <div class="bg-image card shadow-1-strong">
+                        <div class="card-body text-dark">
                             <div class="user-info">
                                 <div class="avatar">
                                     {% if post.author.profile.avatar %}
-                                    <img src="{{ post.author.profile.avatar.url }}"
-                                    alt="Avatar"
-                                    class="img-fluid">
+                                        <img src="{{ post.author.profile.avatar.url }}"
+                                             alt="Avatar"
+                                             class="img-fluid">
                                     {% else %}
-                                    <img src="{% static 'images/transparent.jpg' %}"
-                                    alt="No Avatar"
-                                    class="img-fluid">
+                                        <img src="{% static 'images/transparent.jpg' %}"
+                                             alt="No Avatar"
+                                             class="img-fluid">
                                     {% endif %}
                                 </div>
-                                <h4>
-                                    <a href="{% url 'user_profile' post.author.username %}"
-                                       style="text-decoration: none;
-                                              color: #4CAF50;
-                                              transition: color 0.3s ease"
-                                       onmouseover="this.style.color='#FF5722'"
-                                       onmouseout="this.style.color='#4CAF50'">{{ post.author }}</a>
-                                </h4>
+                                <div>
+                                    <h4 class="username">
+                                        <a href="{% url 'user_profile' post.author.username %}"
+                                           class="user-link">{{ post.author }}</a>
+                                    </h4>
+                                    <div class="post-date">
+                                        {{ post.publish_date }}
+                                        {% if post.for_subscribers %}
+                                            <span class="lock-icon">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                             {% if post.categories.exists %}
                                 <p>
@@ -80,14 +59,10 @@
                                 <p>Категории не выбраны</p>
                             {% endif %}
                             <h2>{{ post.title }}</h2>
-                            <p>{{ post.body }}</p>
-                            {% if post.for_subscribers %}
-                                <p>
-                                    <span style="color: red;">
-                                        <i class="fas fa-lock"></i> Этот пост доступен только для подписчиков
-                                    </span>
-                                </p>
-                            {% endif %}
+                            <p>
+                                {{ post.body|truncatewords:50 }}
+                                {% if post.body|wordcount > 50 %}...{% endif %}
+                            </p>
                             <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                         </div>
                     </div>
@@ -97,23 +72,27 @@
     {% empty %}
         <p>Постов пока нет.</p>
     {% endfor %}
-    <!-- Pagination links -->
-    <div class="pagination">
-        <span class="step-links">
+    <div class="tm-pagination__pages">
+        <div class="tm-pagination__page-group">
+            <a class="tm-pagination__page" href="?page=1">««</a>
             {% if page_obj.has_previous %}
-                <a href="?page=1" class="btn btn-secondary">&laquo; первая</a>
-                <a href="?page={{ page_obj.previous_page_number }}"
-                   class="btn btn-secondary">предыдущая</a>
+                <a class="tm-pagination__page"
+                   href="?page={{ page_obj.previous_page_number }}">«</a>
             {% endif %}
-            <span class="current">
-                <b>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</b>
-            </span>
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="tm-pagination__page tm-pagination__page_current"
+                          data-test-id="pagination-current-page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="tm-pagination__page" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}"
-                   class="btn btn-secondary">следующая</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}"
-                   class="btn btn-secondary">последняя &raquo;</a>
+                <a class="tm-pagination__page"
+                   href="?page={{ page_obj.next_page_number }}">»</a>
             {% endif %}
-        </span>
+            <a class="tm-pagination__page"
+               href="?page={{ page_obj.paginator.num_pages }}">»»</a>
+        </div>
     </div>
 {% endblock %}

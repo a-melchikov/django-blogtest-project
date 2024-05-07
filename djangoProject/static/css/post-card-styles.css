@@ -1,0 +1,58 @@
+.user-info h2 a {
+    text-decoration: none;
+    color: #0366d6;
+    transition: color 0.3s ease;
+}
+
+.user-info h2 a:hover {
+    color: #05529b;
+}
+
+.user-info {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.post-date {
+    font-size: 14px;
+    text-align: right;
+    margin-top: -10px;
+}
+
+.avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+
+.avatar img {
+    margin-right: 20px;
+}
+
+.bg-image {
+    background: #fff;
+}
+
+.username {
+    color: #0366d6;
+}
+
+.user-link {
+    text-decoration: none;
+    color: #0366d6;
+    transition: color 0.3s ease;
+}
+
+.user-link:hover {
+    color: #FF5722;
+}
+
+.bi.bi-lock-fill {
+    font-size: 14px;
+}
+
+.lock-icon {
+    color: red;
+}

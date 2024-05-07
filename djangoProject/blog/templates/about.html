@@ -1,23 +1,44 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Мой блог | Обо мне{% endblock %}
-
 {% block content %}
-    <div style="margin-top: 1%">
-        <div class="container-fluid">
-            <div class="row align-items-start">
-                <div class="col">
-                    <div class="bg-image card shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
-                        <div class="card-body text-white">
-                            <h2>Обо мне</h2>
-                            <p>Привет! Меня зовут Андрей. Я создатель этого блога.</p>
-                            <p>Здесь я и вы делитесь своими мыслями, идеями и интересными материалами.</p>
-                            <p>Надеюсь, вам здесь понравится!</p>
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjE_e0oKtt2aoJjBh0SqdnCi0vUbAUO616mM4dglVGXQ&s" alt="Моя фотография" width="100%" height="auto">
-                        </div>
-                    </div>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/about.css' %}">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="about-title">Обо мне</h2>
+                <p class="about-text">Привет! Меня зовут Андрей. Я создатель этого блога.</p>
+                <p class="about-text">Здесь я и вы делитесь своими мыслями, идеями и интересными материалами.</p>
+                <p class="about-text">Надеюсь, вам здесь понравится!</p>
+                <div>
+                    <p>Можете связаться со мной:</p>
+                    <ul class="icon-list">
+                        <li class="icon-item">
+                            <a href="https://t.me/o11220" target="_blank" class="icon-link">
+                                <img src="{% static 'icons/icon-telegram.png' %}"
+                                     alt="Telegram"
+                                     class="icon-link">
+                            </a>
+                        </li>
+                        <li class="icon-item">
+                            <a href="https://vk.com/oandronguy" target="_blank" class="icon-link">
+                                <img src="{% static 'icons/icon-vk.png' %}"
+                                     alt="Vkontakte"
+                                     class="icon-link">
+                            </a>
+                        </li>
+                        <li class="icon-item">
+                            <a href="mailto:andrei.melchikov25@gmail.com"
+                               target="_blank"
+                               class="icon-link">
+                                <img src="{% static 'icons/icon-email.png' %}"
+                                     alt="Email"
+                                     class="icon-link">
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

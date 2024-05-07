@@ -1,0 +1,36 @@
+.card {
+    margin-top: 20px;
+}
+
+.icon-link {
+    width: 128px;
+}
+
+.about-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.about-text {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.icon-list {
+    padding-left: 0;
+    list-style: none;
+    margin-top: 100px;
+    text-align: center;
+}
+
+.icon-item {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.icon-link {
+    text-decoration: none;
+    color: #000;
+}

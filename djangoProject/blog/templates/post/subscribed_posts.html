@@ -1,31 +1,67 @@
 {% extends 'base.html' %}
-
-{% block title %}
-    Посты пользователей, на которых вы подписаны
-{% endblock %}
-
+{% load static %}
+{% block title %}Посты пользователей, на которых вы подписаны{% endblock %}
 {% block content %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/pagination-styles.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/post-card-styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
     <h1>Посты пользователей, на которых вы подписаны</h1>
-
-    {% for post in posts %}
+    <form class="form-inline" method="GET" action="{% url 'search_posts' %}">
+        <input type="text" class="form-control" name="query" placeholder="Поиск...">
+        <button type="submit" class="btn btn-primary">Найти</button>
+    </form>
+    {% for post in page_obj %}
         <div style="margin-top: 1%">
             <div class="row align-items-start">
                 <div class="col">
-                    <div class="bg-image card shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
-                        <div class="card-body text-white">
-                            <h2>{{ post.title }}</h2>
+                    <div class="bg-image card shadow-1-strong">
+                        <div class="card-body text-dark">
+                            <div class="user-info">
+                                <div class="avatar">
+                                    {% if post.author.profile.avatar %}
+                                        <img src="{{ post.author.profile.avatar.url }}"
+                                             alt="Avatar"
+                                             class="img-fluid">
+                                    {% else %}
+                                        <img src="{% static 'images/transparent.jpg' %}"
+                                             alt="No Avatar"
+                                             class="img-fluid">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="username">
+                                        <a href="{% url 'user_profile' post.author.username %}"
+                                           class="user-link">{{ post.author }}</a>
+                                    </h4>
+                                    <div class="post-date">
+                                        {{ post.publish_date }}
+                                        {% if post.for_subscribers %}
+                                            <span class="lock-icon">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
                             {% if post.categories.exists %}
-                                <p>Категории: 
+                                <p>
                                     {% for category in post.categories.all %}
-                                        <b>{{ category.name }}</b>{% if not forloop.last %}, {% endif %}
+                                        <i>{{ category.name }}*</i>
+                                        {% if not forloop.last %},{% endif %}
                                     {% endfor %}
                                 </p>
                             {% else %}
                                 <p>Категории не выбраны</p>
                             {% endif %}
-                            <p>Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b></p>
-                            <p>Дата публикации: {{ post.publish_date }}</p>
-                            <p>{{ post.body }}</p>
+                            <h2>{{ post.title }}</h2>
+                            <p>
+                                {{ post.body|truncatewords:50 }}
+                                {% if post.body|wordcount > 50 %}...{% endif %}
+                            </p>
                             <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                         </div>
                     </div>
@@ -33,6 +69,29 @@
             </div>
         </div>
     {% empty %}
-        <p>Нет постов от пользователей, на которых вы подписаны.</p>
+        <p>Постов пока нет.</p>
     {% endfor %}
+    <div class="tm-pagination__pages">
+        <div class="tm-pagination__page-group">
+            <a class="tm-pagination__page" href="?page=1">««</a>
+            {% if page_obj.has_previous %}
+                <a class="tm-pagination__page"
+                   href="?page={{ page_obj.previous_page_number }}">«</a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="tm-pagination__page tm-pagination__page_current"
+                          data-test-id="pagination-current-page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="tm-pagination__page" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a class="tm-pagination__page"
+                   href="?page={{ page_obj.next_page_number }}">»</a>
+            {% endif %}
+            <a class="tm-pagination__page"
+               href="?page={{ page_obj.paginator.num_pages }}">»»</a>
+        </div>
+    </div>
 {% endblock %}

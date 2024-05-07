@@ -350,7 +350,17 @@ def search_posts(request):
         )
     else:
         posts = Post.objects.all().order_by("-publish_date")
-    return render(request, "search_results.html", {"posts": posts})
+
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get("page")
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(1)
+
+    return render(request, "search_results.html", {"page_obj": page_obj})
 
 
 @login_required
@@ -437,13 +447,41 @@ def subscribed_posts(request):
     subscriptions = Subscription.objects.filter(subscriber=request.user)
     subscribed_authors = [subscription.author for subscription in subscriptions]
 
-    posts = []
+    all_posts = []
 
     for author in subscribed_authors:
         author_posts = Post.objects.filter(author=author)
-        posts.extend(author_posts)
+        all_posts.extend(author_posts)
 
-    return render(request, "post/subscribed_posts.html", {"posts": posts})
+    all_posts_sorted = sorted(all_posts, key=lambda x: x.publish_date, reverse=True)
+
+    paginator = Paginator(all_posts_sorted, 5)
+    page_number = request.GET.get("page")
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(1)
+
+    author_subscribers = {}
+    if request.user.is_authenticated:
+        authors = {post.author_id: post.author for post in page_obj.object_list}
+        author_subscribers = {
+            author_id: list(
+                User.objects.filter(
+                    subscriptions__subscriber=request.user, id=author_id
+                )
+            )
+            for author_id in authors.keys()
+        }
+
+    context = {
+        "page_obj": page_obj,
+        "author_subscribers": author_subscribers,
+    }
+
+    return render(request, "post/subscribed_posts.html", context)
 
 
 @login_required

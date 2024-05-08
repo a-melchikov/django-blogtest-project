@@ -1,148 +1,149 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}
-    Профиль
-{% endblock %}
-
+{% block title %}Профиль{% endblock %}
 {% block content %}
-<style>
-    .subscriber-count {
-        font-size: 24px;
-        font-weight: bold;
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        margin-top: 20px;
-    }
-    
-    
-    .subscriber-title {
-        margin-bottom: 5px;
-        color: #333;
-    }
-    
-    .subscriber-number {
-        display: block;
-        color: #007bff;
-        font-size: 36px;
-    }
-
-    .container {
-        background-color: #ffffff;
-        padding: 20px;
-        margin-top: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
-    }
-
-
-    .avatar img {
-        width: 200px;
-        height: 200px;
-        border-radius: 50%;
-        border: 2px solid black;
-    }
-
-    .profile-info {
-        flex-grow: 1;
-    }
-    .avatar {
-        margin-right: 20px;
-    }
-    
-    .subscriber-count {
-        font-size: 24px;
-        font-weight: bold;
-        margin-top: 20px;
-    }
-    
-    @media (max-width: 767px) {
-        .avatar {
-            margin-right: 0;
-        }
-    
-        .subscriber-count {
-            position: relative;
-            margin-top: 10px;
-            margin-left: 20px;
-        }
-    }
-</style>
-
-<div class="container">
-    <div class="avatar">
-        {% if user.profile.avatar %}
-            <img src="{{ user.profile.avatar.url }}" alt="Avatar">
-        {% else %}
-            <img src="{% static 'images/transparent.jpg' %}" alt="No Avatar">
-        {% endif %}
-    </div>
-    <div class="profile-info">
-        <h1>Профиль</h1>
-        <div class="subscriber-count">
-            <h2 class="subscriber-title">Подписчики:</h2>
-            <span class="subscriber-number">{{ subscriber_count }}</span>
-            <a href="{% url 'subscriber_list' user.username %}" class="btn btn-primary">Показать всех подписчиков</a>
-        </div>
-        <p>Имя пользователя: {{ user.username }}</p>
-        <p>Дата рождения: {% if user.profile.date_of_birth %}{{ user.profile.date_of_birth }}{% else %}Не указана{% endif %}</p>
-        <p>Страна: {% if user.profile.country %}{{ user.profile.country }}{% else %}Не указана{% endif %}</p>
-        <p>Город: {% if user.profile.city %}{{ user.profile.city }}{% else %}Не указан{% endif %}</p>
-        <p>Дата регистрации: {{ user.profile.registration_date }}</p>
-        <p>О себе: {% if user.profile.bio %}{{ user.profile.bio }}{% else %}Информация не заполнена{% endif %}</p>
-
-        {% if not request.user.is_authenticated or request.user != user %}
-            <a href="{% url 'send_message' %}" class="btn btn-primary">Написать сообщение</a>
-            
-            {% if is_subscribed %}
-                <form action="{% url 'unsubscribe' user.id %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Отписаться</button>
-                </form>
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/container.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/post-card-styles.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/profile.css' %}">
+    <div class="container">
+        <div class="avatar-profile">
+            {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="Avatar">
             {% else %}
-                <form action="{% url 'subscribe' user.id %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Подписаться</button>
-                </form>
+                <img src="{% static 'images/transparent.jpg' %}" alt="No Avatar">
             {% endif %}
-
-        {% endif %}
-        {% if request.user.is_authenticated and request.user == user %}
-            <a href="{% url 'edit_profile' user.username %}" class="btn btn-primary">Редактировать профиль</a>
-            <a href="{% url 'favorite_posts' %}" class="btn btn-primary">Посмотреть избранное</a>
-        {% endif %}
-        <a href="{% url 'all_profiles' %}" class="btn btn-primary">Посмотреть все профили</a>
-    </div>
-</div>
-
-<div class="container">
-    <h1>Посты пользователя {{ user.username }}</h1>
-    <div class="col-md-12">
-        {% for post in user_posts %}
-        <div class="bg-image card mb-4 shadow-1-strong"
-            style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
-            <div class="card-body text-white">
-                <h2>{{ post.title }}</h2>
-                {% if post.categories.exists %}
-                <p>Категории: {% for category in post.categories.all %}<b>{{ category.name }}</b>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-                {% else %}
-                <p>Категории не выбраны</p>
-                {% endif %}
-                <p>Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b></p>
-                <p>Дата публикации: {{ post.publish_date }}</p>
-                <p>{{ post.body }}</p>
-                <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
-            </div>
         </div>
+        <div class="profile-info">
+            <h1>Профиль</h1>
+            <div class="subscriber-count">
+                <h2 class="subscriber-title">Подписчики:</h2>
+                <span class="subscriber-number">{{ subscriber_count }}</span>
+                <a href="{% url 'subscriber_list' user.username %}"
+                   class="btn btn-primary">Показать всех подписчиков</a>
+            </div>
+            <p>Имя пользователя: {{ user.username }}</p>
+            <p>
+                Дата рождения:
+                {% if user.profile.date_of_birth %}
+                    {{ user.profile.date_of_birth }}
+                {% else %}
+                    Не указана
+                {% endif %}
+            </p>
+            <p>
+                Страна:
+                {% if user.profile.country %}
+                    {{ user.profile.country }}
+                {% else %}
+                    Не указана
+                {% endif %}
+            </p>
+            <p>
+                Город:
+                {% if user.profile.city %}
+                    {{ user.profile.city }}
+                {% else %}
+                    Не указан
+                {% endif %}
+            </p>
+            <p>Дата регистрации: {{ user.profile.registration_date }}</p>
+            <p>
+                О себе:
+                {% if user.profile.bio %}
+                    {{ user.profile.bio }}
+                {% else %}
+                    Информация не заполнена
+                {% endif %}
+            </p>
+            {% if not request.user.is_authenticated or request.user != user %}
+                <a href="{% url 'send_message' %}" class="btn btn-primary">Написать сообщение</a>
+                {% if is_subscribed %}
+                    <form action="{% url 'unsubscribe' user.id %}"
+                          method="post"
+                          style="display: inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Отписаться</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'subscribe' user.id %}"
+                          method="post"
+                          style="display: inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Подписаться</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+            {% if request.user.is_authenticated and request.user == user %}
+                <a href="{% url 'edit_profile' user.username %}" class="btn btn-primary">Редактировать профиль</a>
+                <a href="{% url 'favorite_posts' %}" class="btn btn-primary">Посмотреть избранное</a>
+            {% endif %}
+            <a href="{% url 'all_profiles' %}" class="btn btn-primary">Посмотреть все профили</a>
+        </div>
+    </div>
+    <div class="container-posts">
+        <h1 style="text-align: center;">Посты пользователя {{ user.username }}</h1>
+        {% for post in user_posts %}
+            <div style="margin-top: 1%">
+                <div class="row align-items-start">
+                    <div class="col">
+                        <div class="bg-image card shadow-1-strong">
+                            <div class="card-body text-dark">
+                                <div class="user-info">
+                                    <div class="avatar">
+                                        {% if post.author.profile.avatar %}
+                                            <img src="{{ post.author.profile.avatar.url }}"
+                                                 alt="Avatar"
+                                                 class="img-fluid">
+                                        {% else %}
+                                            <img src="{% static 'images/transparent.jpg' %}"
+                                                 alt="No Avatar"
+                                                 class="img-fluid">
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h4 class="username">
+                                            <a href="{% url 'user_profile' post.author.username %}"
+                                               class="user-link">{{ post.author }}</a>
+                                        </h4>
+                                        <div class="post-date">
+                                            {{ post.publish_date }}
+                                            {% if post.for_subscribers %}
+                                                <span class="lock-icon">
+                                                    <i class="bi bi-lock-fill"></i>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if post.categories.exists %}
+                                    <p>
+                                        {% for category in post.categories.all %}
+                                            <i>{{ category.name }}*</i>
+                                            {% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% else %}
+                                    <p>Категории не выбраны</p>
+                                {% endif %}
+                                <h2>{{ post.title }}</h2>
+                                <p>
+                                    {{ post.body|truncatewords:50 }}
+                                    {% if post.body|wordcount > 50 %}...{% endif %}
+                                </p>
+                                <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         {% empty %}
-        <p>У пользователя пока нет постов.</p>
+            <p>Постов пока нет.</p>
         {% endfor %}
     </div>
-</div>
-
 {% endblock %}

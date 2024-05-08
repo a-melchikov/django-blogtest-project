@@ -1,65 +1,40 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block title %}
     Редактировать профиль
 {% endblock %}
-
 {% block content %}
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        form {
-            margin-top: 20px;
-        }
-        .form-control {
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            padding: 0.375rem 0.75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #495057;
-            background-color: #fff;
-            background-clip: padding-box;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-        .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-        .btn-primary {
-            color: #fff;
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            color: #fff;
-            background-color: #0069d9;
-            border-color: #0062cc;
-        }
-        img {
-            max-width: 200px;
-            max-height: 200px;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/container.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/edit-profile.css' %}">
+    <script src="{% static 'js/image_preview.js' %}"></script>
     <div class="container">
         <h1>Редактировать профиль</h1>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
-            {% if form.instance.avatar %}
-                <img src="{{ form.instance.avatar.url }}" alt="Аватар">
-            {% endif %}
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <div class="mb-3">
+                <label for="id_date_of_birth" class="form-label">Дата рождения</label>
+                <input type="date" class="form-control" id="id_date_of_birth" name="date_of_birth" value="{{ form.instance.date_of_birth }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_country" class="form-label">Страна</label>
+                <input type="text" class="form-control" id="id_country" name="country" value="{{ form.instance.country }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_city" class="form-label">Город</label>
+                <input type="text" class="form-control" id="id_city" name="city" value="{{ form.instance.city }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_bio" class="form-label">Биография</label>
+                <textarea class="form-control" id="id_bio" name="bio" rows="5">{{ form.instance.bio }}</textarea>
+            </div>
+            <div class="avatar-container">
+                <label for="id_avatar" class="form-label">Аватар</label>
+                <input type="file" class="form-control" id="id_avatar" name="avatar" onchange="previewImage(event)">
+                <img id="preview" src="{{ form.instance.avatar.url }}" alt="Аватар">
+            </div>
+            <div class="button-container">
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </div>
         </form>
     </div>
 {% endblock %}

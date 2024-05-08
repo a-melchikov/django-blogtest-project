@@ -285,6 +285,14 @@ def send_message(request):
 def user_profile_view(request, user_name):
     user = get_object_or_404(User, username=user_name)
     user_posts = Post.objects.filter(author=user).order_by("-publish_date")
+
+    subscribed_authors = request.user.subscriptions.values_list("author__id", flat=True)
+    user_posts = user_posts.filter(
+        Q(for_subscribers=False)
+        | Q(author__id__in=subscribed_authors)
+        | Q(author=request.user)
+    )
+
     is_subscribed = False
     if request.user.is_authenticated:
         is_subscribed = request.user.subscriptions.filter(author=user).exists()
@@ -373,7 +381,7 @@ def search_posts(request):
         )
     else:
         posts = Post.objects.all().order_by("-publish_date")
-    
+
     if request.user.is_authenticated:
         subscribed_authors = request.user.subscriptions.values_list(
             "author__id", flat=True

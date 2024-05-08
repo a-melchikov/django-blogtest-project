@@ -1,0 +1,13 @@
+.like-section {
+    display: flex;
+    align-items: center;
+}
+
+.star-icon {
+    font-size: 24px;
+    margin-left: 10px;
+}
+
+.post-author {
+    color: red;
+}

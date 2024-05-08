@@ -328,10 +328,33 @@ def notifications(request):
 
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
+
     posts = Post.objects.filter(categories=category).order_by("-publish_date")
+    if request.user.is_authenticated:
+        subscribed_authors = request.user.subscriptions.values_list(
+            "author__id", flat=True
+        )
+        posts = posts.filter(
+            Q(for_subscribers=False)
+            | Q(author__id__in=subscribed_authors)
+            | Q(author=request.user)
+        )
+    else:
+        posts = posts.filter(for_subscribers=False)
+
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get("page")
+
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
     context = {
         "category": category,
-        "posts": posts,
+        "page_obj": page_obj,
     }
     return render(request, "post/category_posts.html", context)
 
@@ -350,6 +373,18 @@ def search_posts(request):
         )
     else:
         posts = Post.objects.all().order_by("-publish_date")
+    
+    if request.user.is_authenticated:
+        subscribed_authors = request.user.subscriptions.values_list(
+            "author__id", flat=True
+        )
+        posts = posts.filter(
+            Q(for_subscribers=False)
+            | Q(author__id__in=subscribed_authors)
+            | Q(author=request.user)
+        )
+    else:
+        posts = posts.filter(for_subscribers=False)
 
     paginator = Paginator(posts, 5)
     page_number = request.GET.get("page")

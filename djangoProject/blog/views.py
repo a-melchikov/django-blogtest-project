@@ -188,7 +188,20 @@ def create_post(request):
 def my_posts(request):
     user = request.user
     user_posts = Post.objects.filter(author=user).order_by("-publish_date")
-    return render(request, "post/my_posts.html", {"user_posts": user_posts})
+
+    paginator = Paginator(user_posts, 5)
+    page_number = request.GET.get("page")
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    context = {
+        "page_obj": page_obj,
+    }
+    return render(request, "post/my_posts.html", context)
 
 
 @login_required
@@ -218,7 +231,10 @@ def edit_post(request, pk):
     if request.method == "POST":
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
-            form.save()
+            post = form.save(commit=False)
+            post.for_subscribers = request.POST.get("for_subscribers") == "on"
+            post.save()
+            form.save_m2m()
             return redirect("my_posts")
     else:
         form = PostForm(instance=post)
@@ -226,6 +242,8 @@ def edit_post(request, pk):
     selected_categories = post.categories.all()
 
     categories = Category.objects.all()
+    for_subscribers = post.for_subscribers
+
     return render(
         request,
         "post/edit_post.html",
@@ -233,6 +251,7 @@ def edit_post(request, pk):
             "form": form,
             "categories": categories,
             "selected_categories": selected_categories,
+            "for_subscribers": for_subscribers,
         },
     )
 
@@ -241,6 +260,13 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     success_url = reverse_lazy("my_posts")
     template_name = "post/post_confirm_delete.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        post = self.get_object()
+        if post.author == self.request.user:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return get_object_or_404(Post, pk=post.pk)
 
 
 @login_required
@@ -532,11 +558,14 @@ def subscriber_list(request, username):
     user = get_object_or_404(User, username=username)
 
     subscriptions = Subscription.objects.filter(author=user)
+    subscriber_profiles = [
+        subscription.subscriber.profile for subscription in subscriptions
+    ]
 
     return render(
         request,
         "profile/subscriber_list.html",
-        {"user": user, "subscribers": subscriptions},
+        {"user": user, "profile_list": subscriber_profiles},
     )
 
 
@@ -553,9 +582,21 @@ def toggle_favorite(request, post_id):
 @login_required
 def favorite_posts(request):
     favorite_posts = Favorite.objects.filter(user=request.user).select_related("post")
-    return render(
-        request, "post/favorite_posts.html", {"favorite_posts": favorite_posts}
-    )
+    paginator = Paginator(favorite_posts, 5)
+    page_number = request.GET.get("page")
+
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    context = {
+        "page_obj": page_obj,
+    }
+
+    return render(request, "post/favorite_posts.html", context)
 
 
 class SubscriptionConfirmationView(TemplateView):

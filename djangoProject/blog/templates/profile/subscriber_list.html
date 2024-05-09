@@ -1,47 +1,36 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}
-    Список подписчиков
-{% endblock %}
-
+{% block title %}Список подписчиков{% endblock %}
 {% block content %}
-<style>
-    .container {
-        background-color: #ffffff;
-        padding: 20px;
-        margin-top: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .user-info {
-        margin-bottom: 20px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    .user-info h2 {
-        margin-top: 0;
-    }
-    .user-info h2 a {
-        text-decoration: none;
-        color: #0366d6;
-        transition: color 0.3s ease; 
-    }
-    .user-info h2 a:hover {
-        color: #05529b;
-    }
-</style>
-<div class="container">
-    <h1>Список подписчиков пользователя {{ user.username }}</h1>
-    <ul>
-        {% for subscription in subscribers %}
-            <li class="user-info">
-                <h2><a href="{% url 'user_profile' subscription.subscriber.username %}">{{ subscription.subscriber.username }}</a></h2>
-            </li>
-        {% empty %}
-            <li>Подписчиков пока нет</li>
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/post-card-styles.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/all-profiles.css' %}">
+    <div class="container">
+        <h1 style="margin-bottom: 20px;">Список подписчиков пользователя {{ user.username }}</h1>
+        {% for profile in profile_list %}
+            <div class="user-info">
+                <div class="card-body">
+                    <div class="avatar">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="Avatar" class="img-fluid">
+                        {% else %}
+                            <img src="{% static 'images/transparent.jpg' %}"
+                                 alt="No Avatar"
+                                 class="img-fluid">
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="username">
+                            <a href="{% url 'user_profile' profile.user.username %}"
+                               class="user-link">{{ profile.user.username }}</a>
+                        </h4>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
-</div>
+    </div>
+    <div style="margin-top: 20px;"></div>
 {% endblock %}

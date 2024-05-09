@@ -1,30 +1,99 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}
-    Избранное
-{% endblock %}
-
+{% block title %}Избранное{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>Избранные посты</h1>
-    <div class="col-md-12">
-        {% if favorite_posts %}
-            {% for favorite in favorite_posts %}
-                <div class="bg-image card mb-4 shadow-1-strong"
-                    style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
-                    <div class="card-body text-white">
-                        <h2>{{ favorite.post.title }}</h2>
-                        <p>Автор: <b>{{ favorite.post.author }}</b></p>
-                        <p>Дата публикации: {{ favorite.post.publish_date }}</p>
-                        <p>{{ favorite.post.body }}</p>
-                        <a href="{% url 'post_detail' favorite.post.pk %}" class="btn btn-primary">Подробнее</a>
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/pagination-styles.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/post-card-styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+    <h1>Избранное</h1>
+    {% for fav in page_obj %}
+        <div style="margin-top: 1%">
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="bg-image card shadow-1-strong">
+                        <div class="card-body text-dark">
+                            <div class="user-info">
+                                <div class="avatar">
+                                    {% if fav.post.author.profile.avatar %}
+                                        <img src="{{ fav.post.author.profile.avatar.url }}"
+                                             alt="Avatar"
+                                             class="img-fluid">
+                                    {% else %}
+                                        <img src="{% static 'images/transparent.jpg' %}"
+                                             alt="No Avatar"
+                                             class="img-fluid">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="username">
+                                        {% if fav.post.author.username %}
+                                            <a href="{% url 'user_profile' fav.post.author.username %}" class="user-link">{{ fav.post.author }}</a>
+                                        {% else %}
+                                            {{ fav.post.author }}
+                                        {% endif %}
+                                    </h4>
+                                    
+                                    <div class="post-date">
+                                        {{ fav.post.publish_date }}
+                                        {% if fav.post.for_subscribers %}
+                                            <span class="lock-icon">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% if fav.post.categories.exists %}
+                                <p>
+                                    {% for category in fav.post.categories.all %}
+                                        <i>{{ category.name }}*</i>
+                                        {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% else %}
+                                <p>Категории не выбраны</p>
+                            {% endif %}
+                            <h2>{{ fav.post.title }}</h2>
+                            <p>
+                                {{ fav.post.body|truncatewords:50 }}
+                                {% if fav.post.body|wordcount > 50 %}...{% endif %}
+                            </p>
+                            <a href="{% url 'post_detail' fav.post.pk %}" class="btn btn-primary">Подробнее</a>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>Постов пока нет.</p>
+    {% endfor %}
+    <div class="tm-pagination__pages">
+        <div class="tm-pagination__page-group">
+            <a class="tm-pagination__page"
+               href="?query={{ request.GET.query|urlencode }}&page=1">««</a>
+            {% if page_obj.has_previous %}
+                <a class="tm-pagination__page"
+                   href="?query={{ request.GET.query|urlencode }}&page={{ page_obj.previous_page_number }}">«</a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="tm-pagination__page tm-pagination__page_current"
+                          data-test-id="pagination-current-page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="tm-pagination__page"
+                       href="?query={{ request.GET.query|urlencode }}&page={{ num }}">{{ num }}</a>
+                {% endif %}
             {% endfor %}
-        {% else %}
-            <p>У вас пока нет избранных постов.</p>
-        {% endif %}
+            {% if page_obj.has_next %}
+                <a class="tm-pagination__page"
+                   href="?query={{ request.GET.query|urlencode }}&page={{ page_obj.next_page_number }}">»</a>
+            {% endif %}
+            <a class="tm-pagination__page"
+               href="?query={{ request.GET.query|urlencode }}&page={{ page_obj.paginator.num_pages }}">»»</a>
+        </div>
     </div>
-</div>
 {% endblock %}

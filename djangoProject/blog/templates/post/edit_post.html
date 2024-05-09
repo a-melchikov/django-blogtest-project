@@ -1,55 +1,56 @@
 {% extends "base.html" %}
-
-{% block title %}
-    Редактирование поста
-{% endblock %}
-
+{% load static %}
+{% block title %}Редактирование поста{% endblock %}
 {% block content %}
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        form {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/container.css' %}">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h1 class="text-center mb-4">Редактирование поста</h1>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="id_title" class="form-label">Заголовок</label>
-                        {{ form.title }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_body" class="form-label">Содержание</label>
-                        <textarea class="form-control" id="id_body" name="body" rows="5">{{ form.body.value }}</textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="categories" class="form-label">Выберите категории</label>
-                        <div>
-                            {% for category in categories %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category_{{ category.id }}" name="categories" value="{{ category.id }}" {% if category in selected_categories %}checked{% endif %}>
-                                    <label class="form-check-label" for="category_{{ category.id }}">{{ category.name }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Сохранить изменения</button>
-                    </div>
-                </form>
+        <h1 class="text-center mb-4">Редактирование поста</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="title" class="form-label">Заголовок</label>
+                <input type="text"
+                       class="form-control"
+                       id="title"
+                       name="title"
+                       value="{{ form.title.value }}">
             </div>
-        </div>
+            <div class="mb-3">
+                <label for="body" class="form-label">Содержание</label>
+                <textarea class="form-control" id="body" name="body" rows="5">{{ form.body.value }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="categories" class="form-label">Выберите категории</label>
+                <div>
+                    {% for category in categories %}
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="category_{{ category.id }}"
+                                   name="categories"
+                                   value="{{ category.id }}"
+                                   {% if category in selected_categories %}checked{% endif %}>
+                            <label class="form-check-label" for="category_{{ category.id }}">{{ category.name }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="mb-3">
+                <p>Выберите параметры доступа к посту:</p>
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="for_subscribers"
+                           name="for_subscribers"
+                           {% if for_subscribers %}checked{% endif %}>
+                    <label class="form-check-label" for="for_subscribers">Ограничить доступ к посту (только для подписчиков)</label>
+                </div>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">Сохранить изменения</button>
+            </div>
+        </form>
     </div>
 {% endblock %}

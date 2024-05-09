@@ -1,71 +1,132 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Мой блог | Мои посты{% endblock %}
-
 {% block content %}
-    <div class="container">
-        <h1>Мои посты</h1>
-        <div class="col-md-12">
-            {% for post in user_posts %}
-                <div class="bg-image card mb-4 shadow-1-strong" style="background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(106,68,76,1) 100%);">
-                    <div class="card-body text-white">
-                        <h2>{{ post.title }}</h2>
-                        {% if post.categories.exists %}
-                            <p>Категории: 
-                                {% for category in post.categories.all %}
-                                    <b>{{ category.name }}</b>{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/pagination-styles.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/post-card-styles.css' %}">
+    <h1>Мои посты</h1>
+    {% for post in page_obj %}
+        <div style="margin-top: 1%">
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="bg-image card shadow-1-strong">
+                        <div class="card-body text-dark">
+                            <div class="user-info">
+                                <div class="avatar">
+                                    {% if post.author.profile.avatar %}
+                                        <img src="{{ post.author.profile.avatar.url }}"
+                                             alt="Avatar"
+                                             class="img-fluid">
+                                    {% else %}
+                                        <img src="{% static 'images/transparent.jpg' %}"
+                                             alt="No Avatar"
+                                             class="img-fluid">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="username">
+                                        <a href="{% url 'user_profile' post.author.username %}"
+                                           class="user-link">{{ post.author }}</a>
+                                    </h4>
+                                    <div class="post-date">
+                                        {{ post.publish_date }}
+                                        {% if post.for_subscribers %}
+                                            <span class="lock-icon">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% if post.categories.exists %}
+                                <p>
+                                    {% for category in post.categories.all %}
+                                        <i>{{ category.name }}*</i>
+                                        {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% else %}
+                                <p>Категории не выбраны</p>
+                            {% endif %}
+                            <h2>{{ post.title }}</h2>
+                            <p>
+                                {{ post.body|truncatewords:50 }}
+                                {% if post.body|wordcount > 50 %}...{% endif %}
                             </p>
-                        {% else %}
-                            <p>Категории не выбраны</p>
-                        {% endif %}
-                        <p>Автор поста: <b><a href="{% url 'user_profile' post.author.username %}">{{ post.author }}</a></b></p>
-                        <p>Дата публикации: {{ post.publish_date }}</p>
-                        <p>{{ post.body }}</p>
-                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
-                        <a href="{% url 'edit_post' post.pk %}" class="btn btn-secondary">Редактировать</a>
-                        <!-- Кнопка "Удалить" для вызова модального окна -->
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal" data-postid="{{ post.pk }}">Удалить</button>
+                            <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
+                            <a href="{% url 'edit_post' post.pk %}" class="btn btn-secondary">Редактировать</a>
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deletePostModal"
+                                    data-postid="{{ post.pk }}">Удалить</button>
+                        </div>
                     </div>
                 </div>
-            {% empty %}
-                <p>У вас пока нет постов.</p>
+            </div>
+        </div>
+    {% empty %}
+        <p>Постов пока нет.</p>
+    {% endfor %}
+    <div class="tm-pagination__pages">
+        <div class="tm-pagination__page-group">
+            <a class="tm-pagination__page" href="?page=1">««</a>
+            {% if page_obj.has_previous %}
+                <a class="tm-pagination__page"
+                   href="?page={{ page_obj.previous_page_number }}">«</a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="tm-pagination__page tm-pagination__page_current"
+                          data-test-id="pagination-current-page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="tm-pagination__page" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
             {% endfor %}
+            {% if page_obj.has_next %}
+                <a class="tm-pagination__page"
+                   href="?page={{ page_obj.next_page_number }}">»</a>
+            {% endif %}
+            <a class="tm-pagination__page"
+               href="?page={{ page_obj.paginator.num_pages }}">»»</a>
         </div>
     </div>
-
     <!-- Модальное окно для подтверждения удаления поста -->
-    <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
+    <div class="modal fade"
+         id="deletePostModal"
+         tabindex="-1"
+         aria-labelledby="deletePostModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deletePostModalLabel">Удаление поста</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    Вы уверены, что хотите удалить этот пост?
-                </div>
+                <div class="modal-body">Вы уверены, что хотите удалить этот пост?</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <!-- Кнопка для подтверждения удаления поста -->
                     <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Удалить</a>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- JavaScript for passing the post ID and deleting the post -->
     <script>
-        // Обработчик события щелчка по кнопке "Удалить"
         document.querySelectorAll('.btn-danger').forEach(button => {
             button.addEventListener('click', function() {
                 const postId = this.getAttribute('data-postid');
-                if (postId) { // Проверяем, что postId не равен null или undefined
+                if (postId) {
                     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-                    // Установить атрибут href для кнопки подтверждения удаления
                     confirmDeleteBtn.setAttribute('href', `/post/delete/${postId}/`);
                 }
             });
         });
     </script>
-      
 {% endblock %}

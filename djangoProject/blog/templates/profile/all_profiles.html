@@ -1,49 +1,52 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}
-    Все пользователи
-{% endblock %}
-
+{% block title %}Все пользователи{% endblock %}
 {% block content %}
-    <style>
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .user-info {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .user-info h2 {
-            margin-top: 0;
-        }
-        /* Стили для ссылок */
-        .user-info h2 a {
-            text-decoration: none;
-            color: #0366d6;
-            transition: color 0.3s ease; 
-        }
-        .user-info h2 a:hover {
-            color: #05529b;
-        }
-    </style>
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/post-card-styles.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/all-profiles.css' %}">
     <div class="container">
-        <h1>Список пользователей</h1>
+        <h1 style="margin-bottom: 20px;">Список пользователей</h1>
         {% for profile in profile_list %}
             <div class="user-info">
-                <h2><a href="{% url 'user_profile' profile.user.username %}">{{ profile.user.username }}</a></h2>
-                <p>Дата рождения: {% if profile.date_of_birth %}{{ profile.date_of_birth }}{% else %}Не указана{% endif %}</p>
-                <p>Страна: {% if profile.country %}{{ profile.country }}{% else %}Не указана{% endif %}</p>
-                <p>Город: {% if profile.city %}{{ profile.city }}{% else %}Не указан{% endif %}</p>
-                <p>Дата регистрации: {{ profile.registration_date }}</p>
-                <p>О себе: {% if profile.bio %}{{ profile.bio }}{% else %}Информация не заполнена{% endif %}</p>
+                <div class="card-body">
+                    <div class="avatar">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="Avatar" class="img-fluid">
+                        {% else %}
+                            <img src="{% static 'images/transparent.jpg' %}"
+                                 alt="No Avatar"
+                                 class="img-fluid">
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="username">
+                            <a href="{% url 'user_profile' profile.user.username %}"
+                               class="user-link">{{ profile.user.username }}</a>
+                        </h4>
+                        <p>
+                            Страна:
+                            {% if profile.country %}
+                                {{ profile.country }}
+                            {% else %}
+                                Не указана
+                            {% endif %}
+                        </p>
+                        <p>
+                            Город:
+                            {% if profile.city %}
+                                {{ profile.city }}
+                            {% else %}
+                                Не указан
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
             </div>
         {% endfor %}
     </div>
+    <div style="margin-top: 20px;"></div>
 {% endblock %}

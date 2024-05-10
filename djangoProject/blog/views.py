@@ -272,8 +272,26 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 
 @login_required
 def inbox(request):
+    filter_name = request.GET.get("filter_name")
+
     messages = Message.objects.filter(recipient=request.user).order_by("-timestamp")
-    return render(request, "messages/inbox.html", {"messages": messages})
+
+    if filter_name:
+        messages = messages.filter(sender__username=filter_name)
+
+    paginator = Paginator(messages, 5)
+    page_number = request.GET.get("page")
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    context = {
+        "page_obj": page_obj,
+    }
+    return render(request, "messages/inbox.html", context)
 
 
 @login_required

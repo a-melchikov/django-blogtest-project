@@ -14,6 +14,7 @@ from .views import (
     edit_post,
     edit_profile,
     favorite_posts,
+    get_user_suggestions,
     like_post,
     mark_all_as_viewed,
     mark_as_viewed,
@@ -70,5 +71,10 @@ urlpatterns = [
     path("subscribers/<str:username>/", subscriber_list, name="subscriber_list"),
     path("toggle_favorite/<int:post_id>/", toggle_favorite, name="toggle_favorite"),
     path("favorite-posts/", favorite_posts, name="favorite_posts"),
-    path('subscription-confirmation/<int:post_id>/', SubscriptionConfirmationView.as_view(), name='subscription_confirmation'),
+    path(
+        "subscription-confirmation/<int:post_id>/",
+        SubscriptionConfirmationView.as_view(),
+        name="subscription_confirmation",
+    ),
+    path("get_user_suggestions/", get_user_suggestions, name="get_user_suggestions"),
 ]

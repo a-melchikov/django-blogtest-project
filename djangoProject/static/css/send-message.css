@@ -1,0 +1,28 @@
+#recipient-suggestions {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    width: calc(100% - 12px);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#recipient-suggestions ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#recipient-suggestions ul li {
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#recipient-suggestions ul li:hover {
+    background-color: #f0f0f0;
+}

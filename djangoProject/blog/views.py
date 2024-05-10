@@ -4,6 +4,7 @@ from django.http import (
     Http404,
     HttpResponseForbidden,
     HttpResponseRedirect,
+    JsonResponse,
 )
 from django.urls import reverse, reverse_lazy
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
@@ -609,3 +610,13 @@ class SubscriptionConfirmationView(TemplateView):
         context["post"] = post
         context["post_id"] = post_id
         return context
+
+
+def get_user_suggestions(request):
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        input_text = request.GET.get("input_text", None)
+        if input_text:
+            users = User.objects.filter(username__icontains=input_text)[:5]
+            suggestions = [user.username for user in users]
+            return JsonResponse(suggestions, safe=False)
+    return JsonResponse({}, status=400)

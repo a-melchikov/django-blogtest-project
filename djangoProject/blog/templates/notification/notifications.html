@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block title %}
-    Уведомления
-{% endblock %}
-
+{% load static %}
+{% block title %}Уведомления{% endblock %}
 {% block content %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/notifications.css' %}">
+    <script src="{% static 'js/notifications.js' %}"></script>
     <div class="container">
-        <h1 style="font-family: Arial, sans-serif;">Уведомления</h1>
-        <form method="post">
-            {% csrf_token %}
-            {% if notifications %}
-                <table class="table table-bordered table-striped">
+        <h1 class="mt-4">Уведомления</h1>
+        {% if notifications %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">Тип</th>
@@ -21,152 +22,50 @@
                     </thead>
                     <tbody>
                         {% for notification in notifications %}
-                            <tr>
-                                <td><strong>{{ notification.type }}</strong></td>
-                                <td>{{ notification.text|safe }}</td>
-                                <td><a href="/profile/{{ notification.sender_name }}/">{{ notification.sender_name }}</a></td>
-                                <td>{{ notification.timestamp }}</td>
-                                <td>
-                                    {% if not notification.viewed %}
-                                        <button type="button" class="btn btn-primary" onclick="markAsViewed({{ notification.id }})">Просмотреть</button>
-                                    {% else %}
-                                        <span class="text-success">Просмотрено</span>
+                            {% if notification.viewed %}
+                                <tr class="text-success">
+                                {% else %}
+                                    <tr>
                                     {% endif %}
-                                    <button type="button" class="btn btn-danger" onclick="deleteNotification({{ notification.id }})">Удалить</button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                    <td>
+                                        <strong>{{ notification.type }}</strong>
+                                    </td>
+                                    <td>{{ notification.text|safe }}</td>
+                                    <td>
+                                        <a href="/profile/{{ notification.sender_name }}/">{{ notification.sender_name }}</a>
+                                    </td>
+                                    <td>{{ notification.timestamp }}</td>
+                                    <td>
+                                        {% if not notification.viewed %}
+                                            <button type="button"
+                                                    class="btn btn-primary"
+                                                    onclick="markAsViewed({{ notification.id }})">Просмотреть</button>
+                                        {% else %}
+                                            <span class="text-success">Просмотрено</span>
+                                        {% endif %}
+                                        <button type="button"
+                                                class="btn btn-danger"
+                                                onclick="deleteNotification({{ notification.id }})">Удалить</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <form method="post" action="{% url 'delete_all_notifications' %}">
+                    {% csrf_token %}
+                    <button type="button"
+                            class="btn btn-danger"
+                            onclick="deleteAllNotifications()">Удалить все уведомления</button>
+                </form>
+                <form method="post"
+                      action="{% url 'mark_all_as_viewed' %}"
+                      onsubmit="markAllAsViewed(event)">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Просмотреть все уведомления</button>
+                </form>
             {% else %}
-                <p>Нет уведомлений.</p>
+                <p>У вас нет непросмотренных уведомлений.</p>
             {% endif %}
-        </form>
-        {% if notifications %}
-            <form method="post" action="{% url 'delete_all_notifications' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Удалить все уведомления</button>
-            </form>
-            <form method="post" action="{% url 'mark_all_as_viewed' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Просмотреть все уведомления</button>
-            </form>
-        {% endif %}
-
-    </div>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #ddd;
-        }
-
-        .table th, .table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        .table th {
-            background-color: #f2f2f2;
-        }
-
-        .checkbox-container {
-            display: block;
-            position: relative;
-            padding-left: 35px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .checkbox-container input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 25px;
-            width: 25px;
-            background-color: #eee;
-            border: 1px solid #ccc;
-        }
-
-        .checkbox-container:hover input ~ .checkmark {
-            background-color: #ccc;
-        }
-
-        .checkbox-container input:checked ~ .checkmark {
-            background-color: #2196F3;
-        }
-
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
-
-        .checkbox-container input:checked ~ .checkmark:after {
-            display: block;
-        }
-
-        .checkbox-container .checkmark:after {
-            left: 9px;
-            top: 5px;
-            width: 5px;
-            height: 10px;
-            border: solid white;
-            border-width: 0 3px 3px 0;
-            transform: rotate(45deg);
-        }
-    </style>
-
-    <script>
-        function deleteNotification(notificationId) {
-            if (confirm("Вы уверены, что хотите удалить это уведомление?")) {
-                fetch(`/delete_notification/${notificationId}/`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    },
-                })
-                .then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        console.error('Failed to delete notification');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        }
-
-        function markAsViewed(notificationId) {
-            fetch(`/mark_as_viewed/${notificationId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    console.error('Failed to mark notification as viewed');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
-{% endblock %}
+        </div>
+    {% endblock %}

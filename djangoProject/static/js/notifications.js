@@ -1,9 +1,10 @@
+
 function deleteNotification(notificationId) {
     if (confirm("Вы уверены, что хотите удалить это уведомление?")) {
         fetch(`/delete_notification/${notificationId}/`, {
             method: 'DELETE',
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
+                'X-CSRFToken': csrfToken,
             },
         })
             .then(response => {
@@ -22,7 +23,7 @@ function markAsViewed(notificationId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
+            'X-CSRFToken': csrfToken,
         }
     })
         .then(response => {
@@ -40,7 +41,7 @@ function deleteAllNotifications(event) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
+                'X-CSRFToken': csrfToken,
             },
         })
             .then(response => {
@@ -65,7 +66,7 @@ function markAllAsViewed(event) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
+                'X-CSRFToken': csrfToken,
             },
         })
             .then(response => {

@@ -62,7 +62,8 @@
                 {% endif %}
             </p>
             {% if not request.user.is_authenticated or request.user != user %}
-                <a href="{% url 'send_message' %}" class="btn btn-primary">Написать сообщение</a>
+                <a href="{% url 'send_message' %}?recipient={{ user.username }}"
+                   class="btn btn-primary">Написать сообщение</a>
                 {% if is_subscribed %}
                     <form action="{% url 'unsubscribe' user.id %}"
                           method="post"
@@ -90,54 +91,58 @@
         <h1 style="text-align: center;">Посты пользователя {{ user.username }}</h1>
         <div class="row">
             {% for post in user_posts %}
-            <div class="col-12 mb-4">
-                <div class="bg-image card shadow-1-strong">
-                    <div class="card-body text-dark">
-                        <div class="user-info">
-                            <div class="avatar">
-                                {% if post.author.profile.avatar %}
-                                <img src="{{ post.author.profile.avatar.url }}" alt="Avatar" class="img-fluid">
-                                {% else %}
-                                <img src="{% static 'images/transparent.jpg' %}" alt="No Avatar" class="img-fluid">
-                                {% endif %}
-                            </div>
-                            <div>
-                                <h4 class="username">
-                                    <a href="{% url 'user_profile' post.author.username %}" class="user-link">{{ post.author }}</a>
-                                </h4>
-                                <div class="post-date">
-                                    {{ post.publish_date }}
-                                    {% if post.for_subscribers %}
-                                    <span class="lock-icon">
-                                        <i class="bi bi-lock-fill"></i>
-                                    </span>
+                <div class="col-12 mb-4">
+                    <div class="bg-image card shadow-1-strong">
+                        <div class="card-body text-dark">
+                            <div class="user-info">
+                                <div class="avatar">
+                                    {% if post.author.profile.avatar %}
+                                        <img src="{{ post.author.profile.avatar.url }}"
+                                             alt="Avatar"
+                                             class="img-fluid">
+                                    {% else %}
+                                        <img src="{% static 'images/transparent.jpg' %}"
+                                             alt="No Avatar"
+                                             class="img-fluid">
                                     {% endif %}
                                 </div>
+                                <div>
+                                    <h4 class="username">
+                                        <a href="{% url 'user_profile' post.author.username %}"
+                                           class="user-link">{{ post.author }}</a>
+                                    </h4>
+                                    <div class="post-date">
+                                        {{ post.publish_date }}
+                                        {% if post.for_subscribers %}
+                                            <span class="lock-icon">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
+                            {% if post.categories.exists %}
+                                <p>
+                                    {% for category in post.categories.all %}
+                                        <i>{{ category.name }}*</i>
+                                        {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% else %}
+                                <p>Категории не выбраны</p>
+                            {% endif %}
+                            <h2>{{ post.title }}</h2>
+                            <p>
+                                {{ post.body|truncatewords:50 }}
+                                {% if post.body|wordcount > 50 %}...{% endif %}
+                            </p>
+                            <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                         </div>
-                        {% if post.categories.exists %}
-                        <p>
-                            {% for category in post.categories.all %}
-                            <i>{{ category.name }}*</i>
-                            {% if not forloop.last %},{% endif %}
-                            {% endfor %}
-                        </p>
-                        {% else %}
-                        <p>Категории не выбраны</p>
-                        {% endif %}
-                        <h2>{{ post.title }}</h2>
-                        <p>
-                            {{ post.body|truncatewords:50 }}
-                            {% if post.body|wordcount > 50 %}...{% endif %}
-                        </p>
-                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                     </div>
                 </div>
-            </div>
             {% empty %}
-            <p>Постов пока нет.</p>
+                <p>Постов пока нет.</p>
             {% endfor %}
         </div>
     </div>
-    
 {% endblock %}

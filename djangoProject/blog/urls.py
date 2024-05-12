@@ -20,8 +20,6 @@ from .views import (
     mark_as_viewed,
     my_posts,
     search_posts,
-    send_message,
-    inbox,
     subscribe,
     subscribed_posts,
     subscriber_list,
@@ -46,8 +44,6 @@ urlpatterns = [
     path(
         "", RedirectView.as_view(pattern_name="home", permanent=False), name="blog_list"
     ),
-    path("send_message/", send_message, name="send_message"),
-    path("inbox/", inbox, name="inbox"),
     path("notifications/", notifications, name="notifications"),
     path("catalog/<slug:category_slug>/", category_posts, name="category_posts"),
     path("search/", search_posts, name="search_posts"),

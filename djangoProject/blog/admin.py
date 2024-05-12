@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Favorite, Like, Notification, Post, Message, Comment, Subscription
+from .models import Category, Favorite, Like, Notification, Post, Comment, Subscription
 
 
 @admin.register(Post)
@@ -9,14 +9,6 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ("title", "body")
     ordering = ("-publish_date",)
     filter_horizontal = ("categories",)
-
-
-@admin.register(Message)
-class MessageAdmin(admin.ModelAdmin):
-    list_display = ("subject", "sender", "recipient", "timestamp", "read")
-    list_filter = ("sender", "recipient", "timestamp", "read")
-    search_fields = ("subject", "body")
-    ordering = ("-timestamp",)
 
 
 @admin.register(Comment)

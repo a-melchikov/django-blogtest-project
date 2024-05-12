@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "autoslug",
     "chat.apps.ChatConfig",
     "authentication.apps.AuthenticationConfig",
+    "messaging.apps.MessagingConfig",
     "blog.apps.BlogConfig",
     "django.contrib.admin",
     "django.contrib.auth",

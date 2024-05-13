@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Favorite, Like, Notification, Post, Comment, Subscription
+from .models import Category, Favorite, Like, Notification, Post, Comment
 
 
 @admin.register(Post)
@@ -37,11 +37,6 @@ class LikeAdmin(admin.ModelAdmin):
     list_display = ("user", "post", "like")
     list_filter = ("like",)
     search_fields = ("user__username", "post__title")
-
-
-@admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ("subscriber", "author")
 
 
 @admin.register(Favorite)

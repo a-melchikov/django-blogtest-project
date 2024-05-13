@@ -6,7 +6,6 @@ from .views import (
     BlogDetailView,
     BlogList,
     PostDeleteView,
-    SubscriptionConfirmationView,
     category_posts,
     create_post,
     delete_all_notifications,
@@ -20,11 +19,9 @@ from .views import (
     mark_as_viewed,
     my_posts,
     search_posts,
-    subscribe,
     subscribed_posts,
     subscriber_list,
     toggle_favorite,
-    unsubscribe,
     user_profile_view,
     notifications,
 )
@@ -52,8 +49,6 @@ urlpatterns = [
         delete_notification,
         name="delete_notification",
     ),
-    path("subscribe/<int:author_id>/", subscribe, name="subscribe"),
-    path("unsubscribe/<int:author_id>/", unsubscribe, name="unsubscribe"),
     path(
         "delete_all_notifications/",
         delete_all_notifications,
@@ -67,10 +62,5 @@ urlpatterns = [
     path("subscribers/<str:username>/", subscriber_list, name="subscriber_list"),
     path("toggle_favorite/<int:post_id>/", toggle_favorite, name="toggle_favorite"),
     path("favorite-posts/", favorite_posts, name="favorite_posts"),
-    path(
-        "subscription-confirmation/<int:post_id>/",
-        SubscriptionConfirmationView.as_view(),
-        name="subscription_confirmation",
-    ),
     path("get_user_suggestions/", get_user_suggestions, name="get_user_suggestions"),
 ]

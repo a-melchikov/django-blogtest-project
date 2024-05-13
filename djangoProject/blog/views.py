@@ -23,13 +23,13 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from authentication.models import Profile
 
 from authentication.forms import ProfileForm
+from subscriptions.models import Subscription
 from .models import (
     Category,
     Favorite,
     Notification,
     Post,
     Comment,
-    Subscription,
 )
 from .forms import PostForm, CommentForm
 
@@ -417,36 +417,6 @@ def delete_notification(request, notification_id):
 
 
 @login_required
-def subscribe(request, author_id):
-    author = get_object_or_404(User, id=author_id)
-    if request.user != author:
-        if request.method == "POST":
-            Subscription.objects.get_or_create(subscriber=request.user, author=author)
-            Notification.objects.create(
-                user=author,
-                sender=request.user,
-                sender_name=request.user.username,
-                message=f"Пользователь {request.user.username} подписался на ваши обновления: -",
-                is_new=True,
-            )
-            return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
-        else:
-            return render(request, "profile/subscribe.html", {"author": author})
-    else:
-        return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
-
-
-@login_required
-def unsubscribe(request, author_id):
-    author = get_object_or_404(User, id=author_id)
-    if request.method == "POST":
-        Subscription.objects.filter(subscriber=request.user, author=author).delete()
-        return HttpResponseRedirect(reverse("user_profile", args=[author.username]))
-    else:
-        return render(request, "profile/unsubscribe.html", {"author": author})
-
-
-@login_required
 def delete_all_notifications(request):
     if request.method == "POST":
         Notification.objects.filter(user=request.user).delete()
@@ -559,18 +529,6 @@ def favorite_posts(request):
     }
 
     return render(request, "post/favorite_posts.html", context)
-
-
-class SubscriptionConfirmationView(TemplateView):
-    template_name = "post/subscription_confirmation.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        post_id = self.kwargs["post_id"]
-        post = get_object_or_404(Post, pk=post_id)
-        context["post"] = post
-        context["post_id"] = post_id
-        return context
 
 
 def get_user_suggestions(request):

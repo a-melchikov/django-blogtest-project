@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "chat.apps.ChatConfig",
     "authentication.apps.AuthenticationConfig",
     "messaging.apps.MessagingConfig",
+    "subscriptions.apps.SubscriptionsConfig",
     "blog.apps.BlogConfig",
     "django.contrib.admin",
     "django.contrib.auth",

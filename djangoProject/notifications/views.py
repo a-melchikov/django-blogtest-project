@@ -22,6 +22,16 @@ def notifications(request):
 
 
 @login_required
+def delete_notification(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id)
+    if request.user == notification.user:
+        notification.delete()
+        return redirect("notifications")
+    else:
+        return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")
+
+
+@login_required
 def delete_all_notifications(request):
     if request.method == "POST":
         Notification.objects.filter(user=request.user).delete()

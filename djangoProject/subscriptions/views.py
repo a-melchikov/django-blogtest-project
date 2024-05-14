@@ -50,3 +50,19 @@ class SubscriptionConfirmationView(TemplateView):
         context["post"] = post
         context["post_id"] = post_id
         return context
+
+
+@login_required
+def subscriber_list(request, username):
+    user = get_object_or_404(User, username=username)
+
+    subscriptions = Subscription.objects.filter(author=user)
+    subscriber_profiles = [
+        subscription.subscriber.profile for subscription in subscriptions
+    ]
+
+    return render(
+        request,
+        "profile/subscriber_list.html",
+        {"user": user, "profile_list": subscriber_profiles},
+    )

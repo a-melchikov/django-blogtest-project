@@ -2,9 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import (
     Http404,
-    HttpResponseForbidden,
     HttpResponseRedirect,
-    JsonResponse,
 )
 from django.urls import reverse, reverse_lazy
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
@@ -19,10 +17,6 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import UserPassesTestMixin
 
-
-from authentication.models import Profile
-
-from authentication.forms import ProfileForm
 from subscriptions.models import Subscription
 from notifications.models import Notification
 from .models import (
@@ -205,23 +199,6 @@ def my_posts(request):
 
 
 @login_required
-def edit_profile(request, user_name):
-    user = get_object_or_404(User, username=user_name)
-
-    if request.user != user:
-        raise Http404("Вы не имеете прав на редактирование данного профиля")
-
-    if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():
-            form.save()
-            return redirect("user_profile", user_name=request.user.username)
-    else:
-        form = ProfileForm(instance=request.user.profile)
-    return render(request, "profile/edit_profile.html", {"form": form})
-
-
-@login_required
 def edit_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
@@ -267,43 +244,6 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
             return super().dispatch(request, *args, **kwargs)
         else:
             return get_object_or_404(Post, pk=post.pk)
-
-
-@login_required
-def user_profile_view(request, user_name):
-    user = get_object_or_404(User, username=user_name)
-    user_posts = Post.objects.filter(author=user).order_by("-publish_date")
-
-    subscribed_authors = request.user.subscriptions.values_list("author__id", flat=True)
-    user_posts = user_posts.filter(
-        Q(for_subscribers=False)
-        | Q(author__id__in=subscribed_authors)
-        | Q(author=request.user)
-    )
-
-    is_subscribed = False
-    if request.user.is_authenticated:
-        is_subscribed = request.user.subscriptions.filter(author=user).exists()
-    subscriber_count = user.subscribers.count()
-    return render(
-        request,
-        "profile/profile.html",
-        {
-            "user": user,
-            "user_posts": user_posts,
-            "is_subscribed": is_subscribed,
-            "subscriber_count": subscriber_count,
-        },
-    )
-
-
-class AllProfilesView(ListView):
-    model = Profile
-    template_name = "profile/all_profiles.html"
-    context_object_name = "profile_list"
-
-    def get_queryset(self):
-        return Profile.objects.all()
 
 
 def category_posts(request, category_slug):
@@ -391,16 +331,6 @@ def like_post(request, pk):
 
 
 @login_required
-def delete_notification(request, notification_id):
-    notification = get_object_or_404(Notification, id=notification_id)
-    if request.user == notification.user:
-        notification.delete()
-        return redirect("notifications")
-    else:
-        return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")
-
-
-@login_required
 def subscribed_posts(request):
     subscriptions = Subscription.objects.filter(subscriber=request.user)
     subscribed_authors = [subscription.author for subscription in subscriptions]
@@ -443,22 +373,6 @@ def subscribed_posts(request):
 
 
 @login_required
-def subscriber_list(request, username):
-    user = get_object_or_404(User, username=username)
-
-    subscriptions = Subscription.objects.filter(author=user)
-    subscriber_profiles = [
-        subscription.subscriber.profile for subscription in subscriptions
-    ]
-
-    return render(
-        request,
-        "profile/subscriber_list.html",
-        {"user": user, "profile_list": subscriber_profiles},
-    )
-
-
-@login_required
 def toggle_favorite(request, post_id):
     post = Post.objects.get(pk=post_id)
     user = request.user
@@ -486,13 +400,3 @@ def favorite_posts(request):
     }
 
     return render(request, "post/favorite_posts.html", context)
-
-
-def get_user_suggestions(request):
-    if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        input_text = request.GET.get("input_text", None)
-        if input_text:
-            users = User.objects.filter(username__icontains=input_text)[:5]
-            suggestions = [user.username for user in users]
-            return JsonResponse(suggestions, safe=False)
-    return JsonResponse({}, status=400)

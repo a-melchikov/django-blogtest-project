@@ -1,6 +1,8 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.contrib.auth.models import User
 from authentication.models import Profile
 from notifications.models import Notification
 from .models import Message
@@ -60,3 +62,13 @@ def send_message(request):
     else:
         profiles = Profile.objects.all()
         return render(request, "messages/send_message.html", {"profiles": profiles})
+
+
+def get_user_suggestions(request):
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        input_text = request.GET.get("input_text", None)
+        if input_text:
+            users = User.objects.filter(username__icontains=input_text)[:5]
+            suggestions = [user.username for user in users]
+            return JsonResponse(suggestions, safe=False)
+    return JsonResponse({}, status=400)

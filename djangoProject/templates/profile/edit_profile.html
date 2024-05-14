@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Редактировать профиль{% endblock %}
+{% block content %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/container.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/edit-profile.css' %}">
+    <script src="{% static 'js/image_preview.js' %}"></script>
+    <div class="container">
+        <h1>Редактировать профиль</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_date_of_birth" class="form-label">Дата рождения</label>
+                <input type="date"
+                       class="form-control"
+                       id="id_date_of_birth"
+                       name="date_of_birth"
+                       value="{{ form.instance.date_of_birth }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_country" class="form-label">Страна</label>
+                <input type="text"
+                       class="form-control"
+                       id="id_country"
+                       name="country"
+                       value="{{ form.instance.country }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_city" class="form-label">Город</label>
+                <input type="text"
+                       class="form-control"
+                       id="id_city"
+                       name="city"
+                       value="{{ form.instance.city }}">
+            </div>
+            <div class="mb-3">
+                <label for="id_bio" class="form-label">Биография</label>
+                <textarea class="form-control" id="id_bio" name="bio" rows="5">{{ form.instance.bio }}</textarea>
+            </div>
+            <div class="avatar-container">
+                <label for="id_avatar" class="form-label">Аватар</label>
+                <input type="file"
+                       class="form-control"
+                       id="id_avatar"
+                       name="avatar"
+                       onchange="previewImage(event)">
+                {% if post.author.profile.avatar %}
+                    <img id="preview" src="{{ form.instance.avatar.url }}" alt="Аватар">
+                {% else %}
+                    <img id="preview"
+                         src="{% static 'images/transparent.jpg' %}"
+                         alt="Нету аватара">
+                {% endif %}
+            </div>
+            <div class="button-container">
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

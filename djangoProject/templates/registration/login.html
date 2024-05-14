@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}
-    Вход
-{% endblock %}
-
+{% block title %}Вход{% endblock %}
 {% block content %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/authentication.css' %}">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -13,13 +12,10 @@
                 {% if messages %}
                     <div class="alert alert-info">
                         <ul>
-                            {% for message in messages %}
-                                <li>{{ message }}</li>
-                            {% endfor %}
+                            {% for message in messages %}<li>{{ message }}</li>{% endfor %}
                         </ul>
                     </div>
                 {% endif %}
-                
                 <form method="post" class="auth-form">
                     {% csrf_token %}
                     <div class="mb-3">
@@ -30,10 +26,11 @@
                         <label for="password" class="form-label">Пароль:</label>
                         <input type="password" id="password" name="password" class="form-control">
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Войти</button>
+                    <button type="submit" class="btn btn-primary btn-block auth-btn">Войти</button>
                 </form>
-                
-                <p class="text-center mt-3">Еще нет аккаунта? <a href="{% url 'register' %}" class="btn btn-secondary">Зарегистрироваться</a></p>
+                <p class="text-center mt-3">
+                    Еще нет аккаунта? <a href="{% url 'register' %}" class="btn btn-secondary auth-btn">Зарегистрироваться</a>
+                </p>
             </div>
         </div>
     </div>

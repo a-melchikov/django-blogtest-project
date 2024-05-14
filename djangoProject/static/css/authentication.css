@@ -1,5 +1,5 @@
 .container {
-    max-width: 400px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ccc;
@@ -21,6 +21,7 @@ label {
 }
 
 input[type="text"],
+input[type="email"],
 input[type="password"] {
     width: 100%;
     padding: 10px;
@@ -29,7 +30,7 @@ input[type="password"] {
     box-sizing: border-box;
 }
 
-.btn {
+.auth-btn {
     display: block;
     width: 100%;
     padding: 10px;
@@ -40,7 +41,7 @@ input[type="password"] {
     cursor: pointer;
 }
 
-.btn:hover {
+.auth-btn:hover {
     background-color: #0056b3;
 }
 

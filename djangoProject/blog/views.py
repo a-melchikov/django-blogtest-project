@@ -24,10 +24,10 @@ from authentication.models import Profile
 
 from authentication.forms import ProfileForm
 from subscriptions.models import Subscription
+from notifications.models import Notification
 from .models import (
     Category,
     Favorite,
-    Notification,
     Post,
     Comment,
 )
@@ -306,22 +306,6 @@ class AllProfilesView(ListView):
         return Profile.objects.all()
 
 
-@login_required
-def notifications(request):
-    user = request.user
-    not_viewed_count = Notification.objects.filter(user=user, viewed=False).count()
-    notif = Notification.objects.filter(user=user, is_new=True)[::-1]
-
-    for notification in notif:
-        notification.type, notification.text = str(notification).split(":")
-
-    return render(
-        request,
-        "notification/notifications.html",
-        {"notifications": notif, "notifications_count": not_viewed_count},
-    )
-
-
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
 
@@ -414,33 +398,6 @@ def delete_notification(request, notification_id):
         return redirect("notifications")
     else:
         return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")
-
-
-@login_required
-def delete_all_notifications(request):
-    if request.method == "POST":
-        Notification.objects.filter(user=request.user).delete()
-        return redirect("notifications")
-
-
-@login_required
-def mark_as_viewed(request, notification_id):
-    notification = get_object_or_404(Notification, id=notification_id)
-    if request.user == notification.user:
-        notification.viewed = True
-        notification.save()
-        return redirect("notifications")
-    else:
-        return HttpResponseForbidden(
-            "Вы не имеете прав на отметку этого уведомления как просмотренного."
-        )
-
-
-@login_required
-def mark_all_as_viewed(request):
-    notifications = Notification.objects.filter(user=request.user, viewed=False)
-    notifications.update(viewed=True)
-    return redirect("notifications")
 
 
 @login_required

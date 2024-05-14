@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Favorite, Like, Notification, Post, Comment
+from .models import Category, Favorite, Like, Post, Comment
 
 
 @admin.register(Post)
@@ -22,14 +22,6 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
-
-
-@admin.register(Notification)
-class NotificationAdmin(admin.ModelAdmin):
-    list_display = ("user", "message", "timestamp", "is_new", "viewed")
-    list_filter = ("timestamp", "is_new", "viewed", "user")
-    search_fields = ("message",)
-    ordering = ("-timestamp",)
 
 
 @admin.register(Like)

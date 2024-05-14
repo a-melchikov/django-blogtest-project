@@ -22,12 +22,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("auth/", include("authentication.urls")),
-    path("", include("blog.urls")),
-    path("chat/", include("chat.urls")),
     path("accounts/", include("authentication.urls")),
+    path("chat/", include("chat.urls")),
+    path("", include("blog.urls")),
     path("", include("messaging.urls")),
     path("", include("subscriptions.urls")),
+    path("", include("notifications.urls")),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

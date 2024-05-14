@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.models import User
 
-from blog.models import Notification, Post
+from notifications.models import Notification
+from blog.models import Post
 from .models import Subscription
 
 

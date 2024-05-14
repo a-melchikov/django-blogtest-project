@@ -2,7 +2,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from authentication.models import Profile
-from blog.models import Notification
+from notifications.models import Notification
 from .models import Message
 
 

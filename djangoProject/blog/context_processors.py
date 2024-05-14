@@ -1,4 +1,5 @@
-from .models import Category, Notification
+from .models import Category
+from notifications.models import Notification
 
 
 def notifications_count(request):

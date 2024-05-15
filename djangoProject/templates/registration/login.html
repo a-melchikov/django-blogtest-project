@@ -24,7 +24,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Пароль:</label>
-                        <input type="password" id="password" name="password" class="form-control">
+                        <div class="password-input-container">
+                            <input type="password" id="password" name="password" class="form-control">
+                            <span toggle="#password" class="password-toggle-icon bi bi-eye"></span>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block auth-btn">Войти</button>
                 </form>
@@ -34,4 +37,25 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordToggleIcons = document.querySelectorAll('.password-toggle-icon');
+            
+            passwordToggleIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const passwordInput = document.querySelector(icon.getAttribute('toggle'));
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.remove('bi-eye');
+                        icon.classList.add('bi-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.remove('bi-eye-slash');
+                        icon.classList.add('bi-eye');
+                    }
+                });
+            });
+        });
+        
+    </script>
 {% endblock %}

@@ -72,3 +72,27 @@ input[type="password"] {
     font-size: 14px;
     margin-top: 10px;
 }
+
+.password-input-container {
+    position: relative;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.password-toggle-icon.bi-eye {
+    font-size: 1.2em;
+}
+
+.password-toggle-icon.bi-eye-slash {
+    font-size: 1.2em;
+}
+
+.password-toggle-icon:hover {
+    color: #007bff;
+}

@@ -21,18 +21,24 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("home")
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect("home")
         else:
-            messages.error(request, "Invalid username or password")
-            return redirect(
-                "login"
-            )  # Перенаправляем обратно на страницу входа с сообщением об ошибке
+            messages.error(request, "Неправильное имя пользователя или пароль. Пожалуйста, попробуйте снова.")
+            return redirect("login")
+    next_url = request.GET.get('next')
+    if next_url:
+        messages.info(request, "Пожалуйста, войдите или зарегистрируйтесь, чтобы просмотреть профиль.")
     return render(request, "registration/login.html")
 
 
 def logout_view(request):
-    logout(request)
-    # Перенаправление на страницу после выхода из системы
+    if request.user.is_authenticated:
+        logout(request)
+        messages.error(request, "Вы успешно вышли из аккаунта")
     return redirect("login")
 
 
@@ -81,17 +87,20 @@ def user_profile_view(request, user_name):
     user = get_object_or_404(User, username=user_name)
     user_posts = Post.objects.filter(author=user).order_by("-publish_date")
 
-    subscribed_authors = request.user.subscriptions.values_list("author__id", flat=True)
-    user_posts = user_posts.filter(
-        Q(for_subscribers=False)
-        | Q(author__id__in=subscribed_authors)
-        | Q(author=request.user)
-    )
-
     is_subscribed = False
-    if request.user.is_authenticated:
-        is_subscribed = request.user.subscriptions.filter(author=user).exists()
     subscriber_count = user.subscribers.count()
+
+    if request.user.is_authenticated:
+        subscribed_authors = request.user.subscriptions.values_list(
+            "author__id", flat=True
+        )
+        user_posts = user_posts.filter(
+            Q(for_subscribers=False)
+            | Q(author__id__in=subscribed_authors)
+            | Q(author=request.user)
+        )
+        is_subscribed = request.user.subscriptions.filter(author=user).exists()
+
     return render(
         request,
         "profile/profile.html",

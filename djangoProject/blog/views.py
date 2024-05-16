@@ -55,11 +55,12 @@ class BlogList(ListView):
         paginator = Paginator(context["posts"], self.paginate_by)
         page_number = self.request.GET.get("page")
         try:
-            page_obj = paginator.get_page(page_number)
+            page_obj = paginator.page(page_number)
         except PageNotAnInteger:
             page_obj = paginator.page(1)
         except EmptyPage:
-            page_obj = paginator.page(paginator.num_pages)
+            page_obj = paginator.page(1)
+
         context["posts"] = page_obj
 
         if self.request.user.is_authenticated:

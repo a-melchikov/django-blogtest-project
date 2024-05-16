@@ -72,3 +72,21 @@ def get_user_suggestions(request):
             suggestions = [user.username for user in users]
             return JsonResponse(suggestions, safe=False)
     return JsonResponse({}, status=400)
+
+@login_required
+def sent_messages(request):
+    messages = Message.objects.filter(sender=request.user).order_by("-timestamp")
+    
+    paginator = Paginator(messages, 5)
+    page_number = request.GET.get("page")
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    context = {
+        "page_obj": page_obj,
+    }
+    return render(request, "messages/sent_messages.html", context)

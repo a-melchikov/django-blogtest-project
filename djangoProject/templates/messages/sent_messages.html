@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Мой блог | Отправленные сообщения{% endblock %}
+{% block content %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/pagination-styles.css' %}">
+    <div style="margin-top: 1%">
+        <div class="container-fluid">
+            <div class="row align-items-start">
+                <div class="col">
+                    <div class="card shadow-1-strong">
+                        <div class="card-body">
+                            <h2>Отправленные сообщения</h2>
+                            <ul class="list-group">
+                                {% for message in page_obj %}
+                                    <li class="list-group-item">
+                                        <strong>Получатель:</strong> {{ message.recipient.username }}
+                                        <br>
+                                        <strong>Тема:</strong> {{ message.subject }}
+                                        <br>
+                                        <strong>Дата и время:</strong> {{ message.timestamp }}
+                                        <br>
+                                    </li>
+                                {% empty %}
+                                    <li class="list-group-item">Нет отправленных сообщений.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tm-pagination__pages">
+        <div class="tm-pagination__page-group">
+            <a class="tm-pagination__page"
+               href="?filter_name={{ request.GET.filter_name|urlencode }}&page=1">««</a>
+            {% if page_obj.has_previous %}
+                <a class="tm-pagination__page"
+                   href="?filter_name={{ request.GET.filter_name|urlencode }}&page={{ page_obj.previous_page_number }}">«</a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="tm-pagination__page tm-pagination__page_current"
+                          data-test-id="pagination-current-page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="tm-pagination__page"
+                       href="?filter_name={{ request.GET.filter_name|urlencode }}&page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a class="tm-pagination__page"
+                   href="?filter_name={{ request.GET.filter_name|urlencode }}&page={{ page_obj.next_page_number }}">»</a>
+            {% endif %}
+            <a class="tm-pagination__page"
+               href="?filter_name={{ request.GET.filter_name|urlencode }}&page={{ page_obj.paginator.num_pages }}">»»</a>
+        </div>
+    </div>
+{% endblock %}

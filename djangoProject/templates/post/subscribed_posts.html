@@ -9,10 +9,17 @@
           type="text/css"
           href="{% static 'css/post-card-styles.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+    <script src="{% static 'js/search.js' %}"></script>
     <h1>Посты пользователей, на которых вы подписаны</h1>
-    <form class="form-inline" method="GET" action="{% url 'search_posts' %}">
-        <input type="text" class="form-control" name="query" placeholder="Поиск...">
-        <button type="submit" class="btn btn-primary">Найти</button>
+    <form class="form-inline"
+          method="GET"
+          action="{% url 'subscribed_posts' %}">
+        <input type="text"
+               class="form-control search-field"
+               name="query"
+               placeholder="Поиск..."
+               id="searchQuery">
+        <button type="submit" class="btn btn-primary" id="searchBtn" disabled>Найти</button>
     </form>
     {% for post in page_obj %}
         <div style="margin-top: 1%">
@@ -69,7 +76,7 @@
             </div>
         </div>
     {% empty %}
-        <p>Постов пока нет.</p>
+        <p>Посты не найдены</p>
     {% endfor %}
     <div class="tm-pagination__pages">
         <div class="tm-pagination__page-group">
@@ -94,4 +101,5 @@
                href="?page={{ page_obj.paginator.num_pages }}">»»</a>
         </div>
     </div>
+    
 {% endblock %}

@@ -1,11 +1,13 @@
 body {
     background-color: #C6C3B5;
 }
+
 .background-area {
     height: 10vh;
     background-color: #C6C3B5;
     padding: 40px;
 }
+
 .username {
     color: #ffffff;
     font-weight: bold;
@@ -13,16 +15,20 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
 .navbar-dark .navbar-nav .nav-link {
     color: #ffffff;
 }
+
 .navbar-dark .navbar-nav .nav-link:hover {
     color: #007bff;
 }
+
 .navbar-dark .navbar-brand {
     color: #ffffff;
     font-weight: bold;
 }
+
 .navbar-nav.extra-nav {
     margin-left: auto;
 }
@@ -31,6 +37,7 @@ body {
     .navbar-nav.extra-nav {
         margin-left: 0;
     }
+
     .navbar-text.username {
         margin-right: 20px;
     }

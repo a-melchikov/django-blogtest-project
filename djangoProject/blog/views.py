@@ -330,15 +330,22 @@ def like_post(request, pk):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
 
 
-@login_required
 def subscribed_posts(request):
     subscriptions = Subscription.objects.filter(subscriber=request.user)
     subscribed_authors = [subscription.author for subscription in subscriptions]
 
+    query = request.GET.get("query")
     all_posts = []
 
     for author in subscribed_authors:
         author_posts = Post.objects.filter(author=author)
+        if query:
+            author_posts = author_posts.filter(
+                Q(title__icontains=query)
+                | Q(body__icontains=query)
+                | Q(author__username__icontains=query)
+            )
+
         all_posts.extend(author_posts)
 
     all_posts_sorted = sorted(all_posts, key=lambda x: x.publish_date, reverse=True)

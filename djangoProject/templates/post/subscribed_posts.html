@@ -66,8 +66,7 @@
                             {% endif %}
                             <h2>{{ post.title }}</h2>
                             <p>
-                                {{ post.body|truncatewords:50 }}
-                                {% if post.body|wordcount > 50 %}...{% endif %}
+                                {{ post.body|truncatewords:50|safe }}
                             </p>
                             <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Подробнее</a>
                         </div>

@@ -2,6 +2,7 @@ from autoslug import AutoSlugField
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField
 
 
 class Category(models.Model):
@@ -22,7 +23,7 @@ class Category(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=450, verbose_name="Заголовок")
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор")
-    body = models.TextField(verbose_name="Текст")
+    body = RichTextField(verbose_name="Текст")
     publish_date = models.DateTimeField(
         default=timezone.now, verbose_name="Дата публикации"
     )

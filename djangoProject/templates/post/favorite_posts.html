@@ -59,8 +59,7 @@
                             {% endif %}
                             <h2>{{ fav.post.title }}</h2>
                             <p>
-                                {{ fav.post.body|truncatewords:50 }}
-                                {% if fav.post.body|wordcount > 50 %}...{% endif %}
+                                {{ fav.post.body|truncatewords:50|safe }}
                             </p>
                             <a href="{% url 'post_detail' fav.post.pk %}" class="btn btn-primary">Подробнее</a>
                         </div>

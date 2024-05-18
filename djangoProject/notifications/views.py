@@ -1,18 +1,20 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render, redirect
-
-from .models import Notification
+from django.shortcuts import redirect, render
+from services.notifications_services import (
+    get_notifications_for_user,
+    get_not_viewed_count_for_user,
+    delete_notification_for_user,
+    delete_all_notifications_for_user,
+    mark_notification_as_viewed,
+    mark_all_notifications_as_viewed,
+)
 
 
 @login_required
 def notifications(request):
-    user = request.user
-    not_viewed_count = Notification.objects.filter(user=user, viewed=False).count()
-    user_notifications = Notification.objects.filter(user=user, is_new=True)[::-1]
-
-    for notification in user_notifications:
-        notification.type, notification.text = str(notification).split(":")
+    user_notifications = get_notifications_for_user(request.user)
+    not_viewed_count = get_not_viewed_count_for_user(request.user)
 
     return render(
         request,
@@ -23,36 +25,28 @@ def notifications(request):
 
 @login_required
 def delete_notification(request, notification_id):
-    notification = get_object_or_404(Notification, id=notification_id)
-    if request.user == notification.user:
-        notification.delete()
+    if delete_notification_for_user(request.user, notification_id):
         return redirect("notifications")
-    else:
-        return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")
+    return HttpResponseForbidden("Вы не имеете прав на удаление этого уведомления.")
 
 
 @login_required
 def delete_all_notifications(request):
     if request.method == "POST":
-        Notification.objects.filter(user=request.user).delete()
+        delete_all_notifications_for_user(request.user)
         return redirect("notifications")
 
 
 @login_required
 def mark_as_viewed(request, notification_id):
-    notification = get_object_or_404(Notification, id=notification_id)
-    if request.user == notification.user:
-        notification.viewed = True
-        notification.save()
+    if mark_notification_as_viewed(request.user, notification_id):
         return redirect("notifications")
-    else:
-        return HttpResponseForbidden(
-            "Вы не имеете прав на отметку этого уведомления как просмотренного."
-        )
+    return HttpResponseForbidden(
+        "Вы не имеете прав на отметку этого уведомления как просмотренного."
+    )
 
 
 @login_required
 def mark_all_as_viewed(request):
-    user_notifications = Notification.objects.filter(user=request.user, viewed=False)
-    user_notifications.update(viewed=True)
+    mark_all_notifications_as_viewed(request.user)
     return redirect("notifications")

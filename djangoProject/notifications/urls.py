@@ -1,5 +1,4 @@
 from django.urls import path
-from django.views.generic.base import RedirectView
 from .views import (
     delete_all_notifications,
     delete_notification,
@@ -9,9 +8,6 @@ from .views import (
 )
 
 urlpatterns = [
-    path(
-        "", RedirectView.as_view(pattern_name="home", permanent=False), name="blog_list"
-    ),
     path("notifications/", notifications, name="notifications"),
     path(
         "delete_all_notifications/",

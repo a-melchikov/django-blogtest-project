@@ -2,11 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from authentication.models import Profile
-from .services import (
+from services.paginators import GeneralPaginator
+from services.messaging_services import (
     get_messages_for_user,
     get_sent_messages_for_user,
     get_user_suggestions_by_text,
-    paginate_messages,
     send_message_from_user_to_user,
 )
 
@@ -15,8 +15,9 @@ from .services import (
 def inbox(request):
     filter_name = request.GET.get("filter_name")
     messages = get_messages_for_user(request.user, filter_name)
-    page_number = request.GET.get("page")
-    page_obj = paginate_messages(messages, page_number)
+    page_number = request.GET.get("page", 1)
+    paginator = GeneralPaginator(messages)
+    page_obj = paginator.get_page(page_number)
     return render(request, "messages/inbox.html", {"page_obj": page_obj})
 
 
@@ -46,6 +47,7 @@ def get_user_suggestions(request):
 @login_required
 def sent_messages(request):
     messages = get_sent_messages_for_user(request.user)
-    page_number = request.GET.get("page")
-    page_obj = paginate_messages(messages, page_number)
+    page_number = request.GET.get("page", 1)
+    paginator = GeneralPaginator(messages)
+    page_obj = paginator.get_page(page_number)
     return render(request, "messages/sent_messages.html", {"page_obj": page_obj})

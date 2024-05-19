@@ -1,30 +1,21 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
-from django.http import (
-    Http404,
-    HttpResponseRedirect,
-)
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
-from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
-from django.views.generic import (
-    ListView,
-    DetailView,
-    TemplateView,
-    DeleteView,
-)
+from django.views.generic import ListView, DetailView, TemplateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth.mixins import UserPassesTestMixin
 
 from subscriptions.models import Subscription
-from notifications.models import Notification
-from .models import (
-    Category,
-    Favorite,
-    Post,
-    Comment,
+from services.paginators import GeneralPaginator
+from services.blog_services import (
+    get_filtered_posts,
+    get_author_subscribers,
+    handle_comment_form,
+    get_user_posts,
+    create_new_post,
 )
+from .models import Category, Post, Favorite
 from .forms import PostForm, CommentForm
 
 
@@ -36,44 +27,20 @@ class BlogList(ListView):
     ordering = "-publish_date"
 
     def get_queryset(self):
-        queryset = Post.objects.all()
-        if self.request.user.is_authenticated:
-            subscribed_authors = self.request.user.subscriptions.values_list(
-                "author__id", flat=True
-            )
-            queryset = queryset.filter(
-                Q(for_subscribers=False)
-                | Q(author__id__in=subscribed_authors)
-                | Q(author=self.request.user)
-            ).order_by(self.ordering)
-        else:
-            queryset = queryset.filter(for_subscribers=False).order_by(self.ordering)
-        return queryset
+        return get_filtered_posts(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(context["posts"], self.paginate_by)
-        page_number = self.request.GET.get("page")
-        try:
-            page_obj = paginator.page(page_number)
-        except PageNotAnInteger:
-            page_obj = paginator.page(1)
-        except EmptyPage:
-            page_obj = paginator.page(1)
-
+        queryset = self.get_queryset()
+        paginator = GeneralPaginator(queryset, self.paginate_by)
+        page_number = self.request.GET.get("page", 1)
+        page_obj = paginator.get_page(page_number)
         context["posts"] = page_obj
 
         if self.request.user.is_authenticated:
-            authors = {post.author_id: post.author for post in page_obj.object_list}
-            author_subscribers = {
-                author_id: list(
-                    User.objects.filter(
-                        subscriptions__subscriber=self.request.user, id=author_id
-                    )
-                )
-                for author_id in authors.keys()
-            }
-            context["author_subscribers"] = author_subscribers
+            context["author_subscribers"] = get_author_subscribers(
+                page_obj.object_list, self.request.user
+            )
 
         return context
 
@@ -90,9 +57,10 @@ class BlogDetailView(UserPassesTestMixin, DetailView):
         )
         context["comment_form"] = CommentForm()
 
-        user = self.request.user
-        if user.is_authenticated:
-            context["is_favorite"] = post.favorite_set.filter(user=user).exists()
+        if self.request.user.is_authenticated:
+            context["is_favorite"] = post.favorite_set.filter(
+                user=self.request.user
+            ).exists()
 
         return context
 
@@ -100,30 +68,7 @@ class BlogDetailView(UserPassesTestMixin, DetailView):
         post = self.get_object()
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            categories = request.POST.getlist("categories")
-            if categories:
-                post.categories.add(*categories)
-
-            sender_name = request.user.username
-
-            user = request.user
-            comments = Comment.objects.filter(post__author=user)
-            comments = Comment.objects.filter(post=post)
-            for com in comments:
-                if not Notification.objects.filter(
-                    Q(user=com.post.author)
-                    & Q(message=f"Новый комментарий: {com.text}")
-                ).exists():
-                    Notification.objects.create(
-                        user=com.post.author,
-                        sender_name=sender_name,
-                        message=f"Новый комментарий: {com.text}",
-                        is_new=True,
-                    )
+            handle_comment_form(post, request.user, form)
             return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -133,9 +78,9 @@ class BlogDetailView(UserPassesTestMixin, DetailView):
         user = self.request.user
         if not post.for_subscribers:
             return True
-        return (post.author == user) or (
-            hasattr(user, "subscriptions")
-            and user.subscriptions.filter(author=post.author).exists()
+        return (
+            post.author == user
+            or user.subscriptions.filter(author=post.author).exists()
         )
 
     def handle_no_permission(self):
@@ -152,24 +97,7 @@ def create_post(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-
-            post.for_subscribers = request.POST.get("for_subscribers", False) == "on"
-            post.save()
-            form.save_m2m()
-
-            post_detail_url = reverse("post_detail", args=[post.id])
-            subscribers = Subscription.objects.filter(author=request.user)
-            for subscriber in subscribers:
-                Notification.objects.create(
-                    user=subscriber.subscriber,
-                    sender=request.user,
-                    sender_name=request.user.username,
-                    message=f"Новый пост: <a href='{post_detail_url}'>{post.title}</a>",
-                    is_new=True,
-                )
-
+            create_new_post(form, request.user)
             return redirect("home")
     else:
         form = PostForm()
@@ -181,28 +109,16 @@ def create_post(request):
 
 @login_required
 def my_posts(request):
-    user = request.user
-    user_posts = Post.objects.filter(author=user).order_by("-publish_date")
-
-    paginator = Paginator(user_posts, 5)
+    user_posts = get_user_posts(request.user)
+    paginator = GeneralPaginator(user_posts)
     page_number = request.GET.get("page")
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-
-    context = {
-        "page_obj": page_obj,
-    }
-    return render(request, "post/my_posts.html", context)
+    page_obj = paginator.get_page(page_number)
+    return render(request, "post/my_posts.html", {"page_obj": page_obj})
 
 
 @login_required
 def edit_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
-
     if request.user != post.author:
         raise Http404("Вы не имеете прав на редактирование данного поста")
 
@@ -218,7 +134,6 @@ def edit_post(request, pk):
         form = PostForm(instance=post)
 
     selected_categories = post.categories.all()
-
     categories = Category.objects.all()
     for_subscribers = post.for_subscribers
 
@@ -249,7 +164,6 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-
     posts = Post.objects.filter(categories=category).order_by("-publish_date")
     if request.user.is_authenticated:
         subscribed_authors = request.user.subscriptions.values_list(
@@ -263,21 +177,14 @@ def category_posts(request, category_slug):
     else:
         posts = posts.filter(for_subscribers=False)
 
-    paginator = Paginator(posts, 5)
+    paginator = GeneralPaginator(posts)
     page_number = request.GET.get("page")
-
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-
-    context = {
-        "category": category,
-        "page_obj": page_obj,
-    }
-    return render(request, "post/category_posts.html", context)
+    page_obj = paginator.get_page(page_number)
+    return render(
+        request,
+        "post/category_posts.html",
+        {"category": category, "page_obj": page_obj},
+    )
 
 
 def search_posts(request):
@@ -307,15 +214,9 @@ def search_posts(request):
     else:
         posts = posts.filter(for_subscribers=False)
 
-    paginator = Paginator(posts, 5)
+    paginator = GeneralPaginator(posts)
     page_number = request.GET.get("page")
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(1)
-
+    page_obj = paginator.get_page(page_number)
     return render(request, "search_results.html", {"page_obj": page_obj})
 
 
@@ -351,14 +252,9 @@ def subscribed_posts(request):
 
     all_posts_sorted = sorted(all_posts, key=lambda x: x.publish_date, reverse=True)
 
-    paginator = Paginator(all_posts_sorted, 5)
+    paginator = GeneralPaginator(all_posts_sorted)
     page_number = request.GET.get("page")
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(1)
+    page_obj = paginator.get_page(page_number)
 
     author_subscribers = {}
     if request.user.is_authenticated:
@@ -372,17 +268,16 @@ def subscribed_posts(request):
             for author_id in authors.keys()
         }
 
-    context = {
-        "page_obj": page_obj,
-        "author_subscribers": author_subscribers,
-    }
-
-    return render(request, "post/subscribed_posts.html", context)
+    return render(
+        request,
+        "post/subscribed_posts.html",
+        {"page_obj": page_obj, "author_subscribers": author_subscribers},
+    )
 
 
 @login_required
 def toggle_favorite(request, post_id):
-    post = Post.objects.get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     user = request.user
     favorite, created = Favorite.objects.get_or_create(user=user, post=post)
     if not created:
@@ -393,18 +288,7 @@ def toggle_favorite(request, post_id):
 @login_required
 def favorite_posts(request):
     favorite_posts = Favorite.objects.filter(user=request.user).select_related("post")
-    paginator = Paginator(favorite_posts, 5)
+    paginator = GeneralPaginator(favorite_posts)
     page_number = request.GET.get("page")
-
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-
-    context = {
-        "page_obj": page_obj,
-    }
-
-    return render(request, "post/favorite_posts.html", context)
+    page_obj = paginator.get_page(page_number)
+    return render(request, "post/favorite_posts.html", {"page_obj": page_obj})

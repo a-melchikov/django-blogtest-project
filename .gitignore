@@ -163,3 +163,4 @@ cython_debug/
 my_base.db
 .pylintrc
 avatars
+.idea

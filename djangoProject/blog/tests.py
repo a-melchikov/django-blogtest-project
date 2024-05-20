@@ -1,128 +1,167 @@
-from django.test import TestCase, Client
+from django.http import Http404
+from django.test import RequestFactory, TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
-from messaging.models import Message
-from notifications.models import Notification
-from .models import Post, Comment
+from blog.models import Post, Category, Comment, Favorite
+from services.paginators import GeneralPaginator
+from subscriptions.models import Subscription
+from services.blog_services import (
+    toggle_post_like,
+    get_subscribed_posts,
+    toggle_favorite_post,
+    get_favorite_posts,
+    get_blog_queryset,
+    get_blog_context,
+    get_post_comments,
+    handle_comment_form,
+    is_favorite_post,
+    create_post_for_user,
+    get_user_posts,
+    get_all_categories,
+    get_post_by_id,
+    check_user_permission_to_edit_post,
+    handle_edit_post_form,
+    get_post_edit_context,
+    get_category_by_slug,
+    get_posts_by_category,
+    get_posts_by_query,
+    get_paginated_posts,
+)
 
 
-class ModelTests(TestCase):
+class ServiceTests(TestCase):
+
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="12345")
-        self.post = Post.objects.create(
-            title="Test Post", author=self.user, body="This is a test post"
+        self.factory = RequestFactory()
+        self.user1 = User.objects.create_user(username="user1", password="pass")
+        self.user2 = User.objects.create_user(username="user2", password="pass")
+
+        self.category1 = Category.objects.create(name="Category1", slug="category1")
+        self.category2 = Category.objects.create(name="Category2", slug="category2")
+
+        self.post1 = Post.objects.create(
+            title="Post 1",
+            body="Body of post 1",
+            author=self.user1,
+            for_subscribers=True,
         )
-        self.message = Message.objects.create(
-            sender=self.user,
-            recipient=self.user,
-            subject="Test Subject",
-            body="This is a test message",
-        )
-        self.comment = Comment.objects.create(
-            post=self.post, author=self.user, text="This is a test comment"
-        )
-        self.notification = Notification.objects.create(
-            user=self.user, message="Test Notification"
-        )
-
-    def test_post_creation(self):
-        self.assertEqual(self.post.title, "Test Post")
-        self.assertEqual(self.post.author, self.user)
-        self.assertEqual(self.post.body, "This is a test post")
-
-    def test_message_creation(self):
-        self.assertEqual(self.message.sender, self.user)
-        self.assertEqual(self.message.recipient, self.user)
-        self.assertEqual(self.message.subject, "Test Subject")
-        self.assertEqual(self.message.body, "This is a test message")
-
-    def test_comment_creation(self):
-        self.assertEqual(self.comment.post, self.post)
-        self.assertEqual(self.comment.author, self.user)
-        self.assertEqual(self.comment.text, "This is a test comment")
-
-    def test_notification_creation(self):
-        self.assertEqual(self.notification.user, self.user)
-        self.assertEqual(self.notification.message, "Test Notification")
-
-    def test_comment_approval(self):
-        self.assertTrue(self.comment.approved_comment)
-        self.comment.approve()
-        self.assertTrue(self.comment.approved_comment)
-
-
-class ViewsTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username="testuser", password="12345")
-        self.post = Post.objects.create(
-            title="Test Post", author=self.user, body="This is a test post"
-        )
-        self.comment = Comment.objects.create(
-            post=self.post, author=self.user, text="This is a test comment"
+        self.post2 = Post.objects.create(
+            title="Post 2",
+            body="Body of post 2",
+            author=self.user2,
+            for_subscribers=False,
         )
 
-    def test_blog_list_view(self):
-        response = self.client.get(reverse("blog_list"))
-        self.assertEqual(response.status_code, 302)
-        self.assertTemplateUsed(response, "home.html")
+        self.comment1 = Comment.objects.create(
+            post=self.post1, author=self.user2, text="Comment 1", approved_comment=True
+        )
 
-    def test_blog_detail_view(self):
-        response = self.client.get(reverse("post_detail", args=[self.post.pk]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "post_detail.html")
+        self.subscription1 = Subscription.objects.create(
+            subscriber=self.user1, author=self.user2
+        )
 
-    def test_create_post_view(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.post(
+        self.favorite1 = Favorite.objects.create(user=self.user1, post=self.post2)
+
+    def test_toggle_post_like(self):
+        toggle_post_like(self.post1.id, self.user1)
+        self.assertIn(self.user1, self.post1.likes.all())
+        toggle_post_like(self.post1.id, self.user1)
+        self.assertNotIn(self.user1, self.post1.likes.all())
+
+    def test_get_subscribed_posts(self):
+        context = get_subscribed_posts(self.user1)
+        self.assertIn(self.post2, context["page_obj"].object_list)
+
+    def test_toggle_favorite_post(self):
+        toggle_favorite_post(self.post1.id, self.user1)
+        self.assertTrue(is_favorite_post(self.user1, self.post1))
+        toggle_favorite_post(self.post1.id, self.user1)
+        self.assertFalse(is_favorite_post(self.user1, self.post1))
+
+    def test_get_favorite_posts(self):
+        context = get_favorite_posts(self.user1)
+        self.assertIn(self.favorite1, context["page_obj"].object_list)
+
+    def test_get_blog_queryset(self):
+        queryset = get_blog_queryset(self.user1, "-publish_date")
+        self.assertIn(self.post1, queryset)
+        self.assertIn(self.post2, queryset)
+
+    def test_get_blog_context(self):
+        paginator = GeneralPaginator(Post.objects.all())
+        context = get_blog_context(self.user1, Post.objects.all(), paginator, 1)
+        self.assertIn("posts", context)
+
+    def test_get_post_comments(self):
+        comments = get_post_comments(self.post1)
+        self.assertIn(self.comment1, comments)
+
+    def test_handle_comment_form(self):
+        request = self.factory.post(
+            reverse("post_comment", args=[self.post1.pk]), {"text": "Nice post!"}
+        )
+        request.user = self.user
+        form = handle_comment_form(request, self.post1)
+        self.assertTrue(form.is_valid())
+
+    def test_is_favorite_post(self):
+        self.assertTrue(is_favorite_post(self.user1, self.post2))
+
+    def test_create_post_for_user(self):
+        request = self.factory.post(
             reverse("create_post"),
-            {"title": "New Test Post", "body": "This is a new test post"},
+            {"title": "New Post", "body": "New Content", "for_subscribers": "on"},
         )
-        self.assertEqual(response.status_code, 302)
+        request.user = self.user
+        form = create_post_for_user(request)
+        self.assertTrue(form.is_valid())
 
-    def test_my_posts_view(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.get(reverse("my_posts"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "my_posts.html")
+    def test_get_user_posts(self):
+        posts = get_user_posts(self.user1)
+        self.assertIn(self.post1, posts)
 
-    def test_edit_post_view(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.post(
-            reverse("edit_post", args=[self.post.pk]),
-            {"title": "Updated Test Post", "body": "This is an updated test post"},
+    def test_get_all_categories(self):
+        categories = get_all_categories()
+        self.assertIn(self.category1, categories)
+        self.assertIn(self.category2, categories)
+
+    def test_get_post_by_id(self):
+        post = get_post_by_id(self.post1.id)
+        self.assertEqual(post, self.post1)
+
+    def test_check_user_permission_to_edit_post(self):
+        with self.assertRaises(Http404):
+            check_user_permission_to_edit_post(self.user2, self.post1)
+
+    def test_handle_edit_post_form(self):
+        request = self.factory.post(
+            reverse("post_edit", args=[self.post1.pk]),
+            {"title": "Updated Post", "body": "Updated Content"},
         )
-        self.assertEqual(response.status_code, 302)
+        request.user = self.user
+        form = handle_edit_post_form(request, self.post1)
+        self.assertTrue(form.is_valid())
 
-    def test_post_delete_view(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.post(reverse("delete_post", args=[self.post.pk]))
-        self.assertEqual(response.status_code, 302)
+    def test_get_post_edit_context(self):
+        context = get_post_edit_context(self.post1)
+        self.assertIn("categories", context)
+        self.assertIn("selected_categories", context)
 
-    def test_inbox_view(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.get(reverse("inbox"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "inbox.html")
+    def test_get_category_by_slug(self):
+        category = get_category_by_slug(self.category1.slug)
+        self.assertEqual(category, self.category1)
 
-    def test_send_message_view(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.get(reverse("send_message"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "send_message.html")
+    def test_get_posts_by_category(self):
+        posts = get_posts_by_category(self.category1, self.user)
+        self.assertIn(self.post1, posts)
 
-    def test_user_profile_view(self):
-        response = self.client.get(reverse("user_profile", args=[self.user.username]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "profile.html")
+    def test_get_posts_by_query(self):
+        posts = get_posts_by_query("Post 1", self.user1)
+        self.assertIn(self.post1, posts)
 
-    def test_all_profiles_view(self):
-        response = self.client.get(reverse("all_profiles"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "all_profiles.html")
-
-    def test_notifications_view(self):
-        self.client.login(username="testuser", password="12345")
-        response = self.client.get(reverse("notifications"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "notifications.html")
+    def test_get_paginated_posts(self):
+        request = self.factory.get(reverse("post_list"))
+        context = get_paginated_posts(
+            request, Post.objects.all().order_by("-publish_date")
+        )
+        self.assertIn("page_obj", context)

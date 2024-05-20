@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "subscriptions",
     "notifications",
     "blog",
+    "services",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

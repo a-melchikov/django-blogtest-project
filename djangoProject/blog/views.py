@@ -145,7 +145,7 @@ def edit_post(request, pk):
 
     context = get_post_edit_context(post)
     context.update({"form": form})
-
+    print(context)
     return render(
         request,
         "post/edit_post.html",

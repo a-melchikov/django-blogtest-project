@@ -50,7 +50,7 @@ $(document).ready(function() {
         $('#recipient-suggestions').hide();
     });
 
-    $('form').submit(function(event) {
+    $('.btn-primary').click(function(event) {
         var enteredName = $('#recipient').val();
         if (suggestions.indexOf(enteredName) === -1) {
             event.preventDefault();

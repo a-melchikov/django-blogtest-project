@@ -5,18 +5,26 @@
     <link rel="stylesheet"
           type="text/css"
           href="{% static 'css/container.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/form-validation.css' %}">
     <script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
     <div class="container">
         <h1>Создать пост</h1>
-        <form method="post" enctype="multipart/form-data">
+        <form id="create-post-form"
+              method="post"
+              enctype="multipart/form-data"
+              novalidate>
             {% csrf_token %}
             <div class="mb-3">
                 <label for="title" class="form-label">Заголовок</label>
-                <input type="text" class="form-control" id="title" name="title">
+                <input type="text" class="form-control" id="title" name="title" required>
+                <div class="invalid-feedback">Поле "Заголовок" обязательно для заполнения.</div>
             </div>
             <div class="mb-3">
                 <label for="body" class="form-label">Содержание</label>
-                <textarea class="form-control" id="body" name="body" rows="5"></textarea>
+                <textarea class="form-control" id="body" name="body" rows="5" required></textarea>
+                <div class="invalid-feedback">Поле "Содержание" обязательно для заполнения.</div>
             </div>
             <div class="mb-3">
                 <label for="categories" class="form-label">Выберите категории</label>
@@ -46,5 +54,6 @@
             <button type="submit" class="btn btn-primary">Отправить</button>
         </form>
     </div>
+    <script src="{% static 'js/form-validation.js' %}"></script>
     <script src="{% static 'js/ckeditor-settings.js' %}"></script>
 {% endblock %}

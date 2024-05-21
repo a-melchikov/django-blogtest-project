@@ -247,7 +247,11 @@ def handle_edit_post_form(request, post: Post) -> PostForm:
     form = PostForm(request.POST, instance=post)
     if form.is_valid():
         post = form.save(commit=False)
-        post.for_subscribers = request.POST.get("for_subscribers") == "on"
+        post.for_subscribers = (
+            request.POST.get("for_subscribers") == "on"
+            if request.POST.get("for_subscribers")
+            else False
+        )
         post.save()
         form.save_m2m()
     return form
@@ -355,7 +359,7 @@ def get_paginated_posts(request, posts: QuerySet[Post]) -> Dict[str, Any]:
     return:
             Dict[str, Any]: Пагинированные посты.
     """
-    posts = posts.order_by('-publish_date')
+    posts = posts.order_by("-publish_date")
     paginator = GeneralPaginator(posts)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)

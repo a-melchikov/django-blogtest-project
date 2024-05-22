@@ -22,6 +22,7 @@ django-ckeditor==6.7.1
 django-js-asset==2.2.0
 djlint==1.34.1
 EditorConfig==0.12.4
+gunicorn==22.0.0
 html-tag-names==0.1.2
 html-void-elements==0.1.0
 hyperlink==21.0.0
@@ -31,9 +32,11 @@ jsbeautifier==1.15.1
 json5==0.9.25
 kombu==5.3.7
 mysqlclient==2.2.4
+packaging==24.0
 pathspec==0.12.1
 pillow==10.3.0
 prompt-toolkit==3.0.43
+psycopg2==2.9.9
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
 pycparser==2.22

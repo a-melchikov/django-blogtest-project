@@ -144,7 +144,13 @@ def edit_post(request, pk):
         form = PostForm(instance=post)
 
     context = get_post_edit_context(post)
-    context.update({"form": form})
+    context.update(
+        {
+            "form": form,
+            "title": post.title,
+            "body": post.body,
+        }
+    )
     print(context)
     return render(
         request,

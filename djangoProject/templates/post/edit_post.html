@@ -22,13 +22,13 @@
                        class="form-control"
                        id="title"
                        name="title"
-                       value="{{ post.title }}"
+                       value="{{ title }}"
                        required>
                 <div class="invalid-feedback">Поле "Заголовок" обязательно для заполнения.</div>
             </div>
             <div class="mb-3">
                 <label for="body" class="form-label">Содержание</label>
-                <textarea class="form-control" id="body" name="body" rows="5" required>{{ post.body }}</textarea>
+                <textarea class="form-control" id="body" name="body" rows="5" required>{{ body }}</textarea>
                 <div class="invalid-feedback">Поле "Содержание" обязательно для заполнения.</div>
             </div>
             <div class="mb-3">

@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
@@ -78,6 +79,13 @@ class BlogDetailView(UserPassesTestMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         post = self.get_object()
+
+        if not request.user.is_authenticated:
+            messages.error(
+                request, "Вы должны войти в систему, чтобы оставить комментарий."
+            )
+            return redirect(reverse("login"))
+
         form = handle_comment_form(request, post)
         if form.is_valid():
             return HttpResponseRedirect(reverse("post_detail", args=[post.pk]))

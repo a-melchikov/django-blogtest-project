@@ -28,8 +28,12 @@ urlpatterns = [
     path("", include("messaging.urls")),
     path("", include("subscriptions.urls")),
     path("", include("notifications.urls")),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path("ckeditor/", include("ckeditor_uploader.urls")),
 ]
+
+handler403 = "djangoProject.errors.tr_handler403"
+handler404 = "djangoProject.errors.tr_handler404"
+handler500 = "djangoProject.errors.tr_handler500"
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

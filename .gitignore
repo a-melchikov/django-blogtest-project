@@ -164,3 +164,4 @@ my_base.db
 .pylintrc
 avatars
 .idea
+.env.prod

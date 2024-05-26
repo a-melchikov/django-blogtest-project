@@ -23,9 +23,9 @@ from .forms import ProfileForm, UserForm
 
 def login_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
+        username_or_email = request.POST.get("username")
         password = request.POST.get("password")
-        user = authenticate_user(request, username, password)
+        user = authenticate_user(request, username_or_email, password)
         if user is not None:
             login_user(request, user)
             next_url = request.GET.get("next")

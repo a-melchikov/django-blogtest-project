@@ -5,16 +5,13 @@
     <link rel="stylesheet"
           type="text/css"
           href="{% static 'css/authentication.css' %}">
+    <script src="{% static 'js/eye.js' %}"></script>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <h2 class="text-center mb-4">Регистрация</h2>
                 <form method="post">
                     {% csrf_token %}
-                    <!-- Поле для отображения ошибок формы -->
-                    {% if user_form.errors %}
-                        <div class="alert alert-danger" role="alert">{{ user_form.non_field_errors }}</div>
-                    {% endif %}
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Имя пользователя:</label>
                         {{ user_form.username }}
@@ -29,7 +26,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="id_password1" class="form-label">Пароль:</label>
-                        {{ user_form.password1 }}
+                        <div class="password-input-container">
+                            {{ user_form.password1 }}
+                            <span toggle="#id_password1" class="password-toggle-icon bi bi-eye"></span>
+                        </div>
                         <!-- Отображение ошибок для поля password1 -->
                         {% for error in user_form.password1.errors %}
                             <div class="alert alert-danger" role="alert">{{ error }}</div>
@@ -37,7 +37,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="id_password2" class="form-label">Повторите пароль:</label>
-                        {{ user_form.password2 }}
+                        <div class="password-input-container">
+                            {{ user_form.password2 }}
+                            <span toggle="#id_password2" class="password-toggle-icon bi bi-eye"></span>
+                        </div>
                         <!-- Отображение ошибок для поля password2 -->
                         {% for error in user_form.password2.errors %}
                             <div class="alert alert-danger" role="alert">{{ error }}</div>

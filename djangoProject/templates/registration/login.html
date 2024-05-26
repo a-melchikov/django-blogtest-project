@@ -5,6 +5,7 @@
     <link rel="stylesheet"
           type="text/css"
           href="{% static 'css/authentication.css' %}">
+    <script src="{% static 'js/eye.js' %}"></script>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -19,10 +20,10 @@
                 <form method="post" class="auth-form">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="username" class="form-label">Имя пользователя:</label>
+                        <label for="username" class="form-label">Имя пользователя или Email:</label>
                         <input type="text" id="username" name="username" class="form-control">
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3">  
                         <label for="password" class="form-label">Пароль:</label>
                         <div class="password-input-container">
                             <input type="password" id="password" name="password" class="form-control">
@@ -37,25 +38,4 @@
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordToggleIcons = document.querySelectorAll('.password-toggle-icon');
-            
-            passwordToggleIcons.forEach(icon => {
-                icon.addEventListener('click', function() {
-                    const passwordInput = document.querySelector(icon.getAttribute('toggle'));
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        icon.classList.remove('bi-eye');
-                        icon.classList.add('bi-eye-slash');
-                    } else {
-                        passwordInput.type = 'password';
-                        icon.classList.remove('bi-eye-slash');
-                        icon.classList.add('bi-eye');
-                    }
-                });
-            });
-        });
-        
-    </script>
 {% endblock %}

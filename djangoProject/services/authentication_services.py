@@ -12,19 +12,25 @@ from authentication.models import Profile
 
 
 def authenticate_user(
-    request: HttpRequest, username: str, password: str
+    request: HttpRequest, username_or_email: str, password: str
 ) -> Optional[User]:
     """
-    Аутентифицирует пользователя на основе имени пользователя и пароля.
+    Аутентифицирует пользователя по имени пользователя или email и паролю.
 
     args:
         request (HttpRequest): Объект запроса.
-        username (str): Имя пользователя.
+        username_or_email (str): Имя пользователя или email.
         password (str): Пароль.
 
     return:
         Optional[User]: Аутентифицированный пользователь или None, если аутентификация не удалась.
     """
+    try:
+        user = User.objects.get(email=username_or_email)
+        username = user.username
+    except User.DoesNotExist:
+        username = username_or_email
+
     return authenticate(request, username=username, password=password)
 
 

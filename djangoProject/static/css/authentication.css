@@ -96,3 +96,13 @@ input[type="password"] {
 .password-toggle-icon:hover {
     color: #007bff;
 }
+
+.btn-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}

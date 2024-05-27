@@ -32,6 +32,11 @@
                     </div>
                     <button type="submit" class="btn btn-primary btn-block auth-btn">Войти</button>
                 </form>
+                <div class="text-center mt-3">
+                    <a href="{% url 'password_reset' %}" class="btn btn-link"> 
+                        <i class="bi bi-key-fill"></i> Забыли пароль?
+                    </a>
+                </div>
                 <p class="text-center mt-3">
                     Еще нет аккаунта? <a href="{% url 'register' %}" class="btn btn-secondary auth-btn">Зарегистрироваться</a>
                 </p>

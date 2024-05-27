@@ -31,7 +31,6 @@ incremental==22.10.0
 jsbeautifier==1.15.1
 json5==0.9.25
 kombu==5.3.7
-mysqlclient==2.2.4
 packaging==24.0
 pathspec==0.12.1
 pillow==10.3.0

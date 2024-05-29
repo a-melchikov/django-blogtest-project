@@ -21,6 +21,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
+from .test_cache import test_cache_view
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("chat/", include("chat.urls")),
@@ -48,6 +50,8 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
+    path('__debug__/', include('debug_toolbar.urls')),
+    path('test_cache/', test_cache_view, name='test_cache'),
 ]
 
 handler403 = "djangoProject.errors.tr_handler403"

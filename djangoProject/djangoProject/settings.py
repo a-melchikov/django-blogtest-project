@@ -35,6 +35,7 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="").split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    "debug_toolbar",
     "channels",
     "autoslug",
     "ckeditor",
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "authentication.middleware.RedirectIfLoggedInMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "djangoProject.urls"
@@ -127,6 +129,16 @@ CHANNEL_LAYERS = {
     },
 }
 
+# CACHES dictionary which contains caching configurations.
+CACHES = {
+    "default": {
+        # Here, we're using the in-memory cache backend.
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        # LOCATION parameter gives a unique name or identifier to this cache instance.
+        "LOCATION": "unique-snowflake",
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -170,3 +182,16 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = config("EMAIL_HOST_USER")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+# Опционально, можно настроить timeout для кеша
+CACHE_TTL = 60 * 15  # 15 минут

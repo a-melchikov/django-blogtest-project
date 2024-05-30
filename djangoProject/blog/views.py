@@ -2,12 +2,14 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import (
     ListView,
     DetailView,
     TemplateView,
     DeleteView,
 )
+from django.views.decorators.cache import cache_page
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -59,6 +61,10 @@ class BlogList(ListView):
             )
         )
         return context
+
+    @method_decorator(cache_page(60 * 15))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
 
 class BlogDetailView(UserPassesTestMixin, DetailView):

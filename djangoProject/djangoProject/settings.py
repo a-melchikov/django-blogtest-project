@@ -35,6 +35,7 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="").split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    "compressor",
     "debug_toolbar",
     "channels",
     "autoslug",
@@ -65,6 +66,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "authentication.middleware.RedirectIfLoggedInMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = "djangoProject.urls"
@@ -183,6 +187,10 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = config("EMAIL_HOST_USER")
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -193,5 +201,16 @@ CACHES = {
     }
 }
 
-# Опционально, можно настроить timeout для кеша
-CACHE_TTL = 60 * 15  # 15 минут
+CACHE_TTL = 60 * 15
+CACHE_MIDDLEWARE_ALIAS = "default"  # имя конфигурации кэша
+CACHE_MIDDLEWARE_SECONDS = 600  # число секунд, на которые кэшируется каждая страница
+CACHE_MIDDLEWARE_KEY_PREFIX = ""  # префикс для ключей кэша
+
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    "compressor.finders.CompressorFinder",
+]
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True

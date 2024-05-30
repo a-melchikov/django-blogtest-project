@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.generic import ListView
+from django.views.decorators.cache import cache_page
 
 from authentication.models import Profile
 from services.authentication_services import (
@@ -92,6 +93,7 @@ def edit_profile(request, user_name):
     return render(request, "profile/edit_profile.html", {"form": form})
 
 
+@cache_page(60 * 15)
 @login_required
 def user_profile_view(request, user_name):
     user = get_user_by_username(user_name)

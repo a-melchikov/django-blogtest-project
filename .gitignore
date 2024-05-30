@@ -165,3 +165,4 @@ my_base.db
 avatars
 .idea
 .env.prod
+staticfiles
